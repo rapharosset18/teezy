@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy my tickets</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div style="flex-grow: 1; overflow: hidden; padding: 56px 16px 0; display: flex; flex-direction: column; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="App-Drawer.dc.html" aria-label="Open profile, 2 friend requests" style="position: relative; width: 40px; height: 40px; border-radius: 999px; background: #111113; color: #FFFFFF; display: grid; place-items: center; font-size: 15px; font-weight: 700; flex-shrink: 0;">R<span style="position: absolute; top: -1px; right: -1px; width: 12px; height: 12px; border-radius: 999px; background: #0A7D50; box-shadow: 0 0 0 2px #FFFFFF;"></span></a>
+      <h1 style="margin: 0; flex-grow: 1; font-size: 28px; font-weight: 700; letter-spacing: -0.03em;">My Tickets</h1>
+      <div role="group" aria-label="View" style="display: flex; padding: 3px; border-radius: 12px; background: #F3F3F1;">
+        <a href="App-Tickets.dc.html" aria-label="List view" aria-current="page" style="width: 40px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: #FFFFFF; box-shadow: 0 1px 3px rgba(17,17,19,0.15);">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>
+        </a>
+        <a href="App-Calendar.dc.html" aria-label="Calendar view" style="width: 40px; height: 34px; border-radius: 9px; display: grid; place-items: center; color: #63636B;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+        </a>
+      </div>
+    </div>
+    <div role="group" aria-label="Ticket type" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 3px; border-radius: 12px; background: #F3F3F1;">
+      <button onClick="{{tabs.up.pick}}" aria-pressed="{{tabs.up.pressed}}" style="{{tabs.up.style}}">Upcoming</button>
+      <a href="App-Passes.dc.html" style="height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 14px; font-weight: 500; color: #63636B;">Passes<span style="width: 7px; height: 7px; border-radius: 999px; background: #0A7D50;" aria-label="1 due"></span></a>
+      <button onClick="{{tabs.sell.pick}}" aria-pressed="{{tabs.sell.pressed}}" style="{{tabs.sell.style}}">Selling</button>
+      <button onClick="{{tabs.past.pick}}" aria-pressed="{{tabs.past.pressed}}" style="{{tabs.past.style}}">Past</button>
+    </div>
+
+    <sc-if value="{{isUpcoming}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="border-radius: 18px; border: 1.5px solid #E4E4E0; overflow: hidden;">
+          <div style="padding: 16px; background: #1F2A44; color: #FFFFFF; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+              <p style="margin: 0; font-size: 13px; font-weight: 600; opacity: 0.8;">SAT, NOV 7 · 7:30 PM</p>
+              <p style="margin: 4px 0 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">USC vs Notre Dame</p>
+            </div>
+            <span style="font-size: 13px; font-weight: 600; opacity: 0.8;">in 12 days</span>
+          </div>
+          <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+              <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #63636B;">Section</span><b style="font-size: 18px;">112</b></span>
+              <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #63636B;">Row</span><b style="font-size: 18px;">24</b></span>
+              <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; color: #63636B;">Seats</span><b style="font-size: 18px;">7, 8</b></span>
+            </div>
+            <p style="margin: 0; font-size: 13px; color: #33463C; padding: 8px 10px; border-radius: 10px; background: #E3F3EB;">Your $148 is held until you scan in.</p>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+              <a href="App-Tickets.dc.html" style="height: 44px; border-radius: 12px; background: #111113; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">View</a>
+              <a href="App-Sell.dc.html" style="height: 44px; border-radius: 12px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">Sell</a>
+              <a href="App-Tickets.dc.html" style="height: 44px; border-radius: 12px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">Transfer</a>
+            </div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px; border-radius: 18px; border: 1.5px solid #E4E4E0;">
+          <span style="width: 52px; height: 56px; border-radius: 12px; background: #6B2D3A; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><span style="font-size: 11px; font-weight: 600; opacity: 0.8;">FRI</span><span style="font-size: 20px; font-weight: 700; line-height: 1;">13</span></span>
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 16px; font-weight: 600;">Sig Ep Fall Formal</span><span style="font-size: 13px; color: #63636B;">1 ticket · The Mayan</span></span>
+          <a href="App-Sell.dc.html" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; font-size: 14px; font-weight: 600;">Sell</a>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isSelling}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="padding: 14px; border-radius: 18px; border: 1.5px solid #E4E4E0; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; gap: 12px;">
+            <div><p style="margin: 0; font-size: 16px; font-weight: 600;">USC vs Oregon · 2 tickets</p><p style="margin: 2px 0 0; font-size: 13px; color: #63636B;">Sec 25, Row 8 · listed at $80 each</p></div>
+            <span style="font-size: 12px; font-weight: 700; height: 24px; padding: 0 8px; border-radius: 999px; background: #E3F3EB; color: #0A6542; display: inline-flex; align-items: center;">2 offers</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+            <a href="App-Sell.dc.html" style="height: 44px; border-radius: 12px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">Edit price</a>
+            <a href="App-Chat.dc.html" style="height: 44px; border-radius: 12px; background: #0A7D50; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">See offers</a>
+          </div>
+        </div>
+        <div style="padding: 14px; border-radius: 18px; border: 1.5px solid #E4E4E0; display: flex; justify-content: space-between; gap: 12px;">
+          <div><p style="margin: 0; font-size: 16px; font-weight: 600;">USC vs UCLA · 1 ticket</p><p style="margin: 2px 0 0; font-size: 13px; color: #63636B;">Student section · listed at $45 · 31 views</p></div>
+          <span style="font-size: 12px; font-weight: 600; height: 24px; padding: 0 8px; border-radius: 999px; background: #F3F3F1; display: inline-flex; align-items: center;">Listed</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isPast}}" hint-placeholder-val="{{ false }}">
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #E4E4E0;">
+        <span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 16px; font-weight: 600;">USC vs Arizona · 2 tickets</span><span style="font-size: 13px; color: #63636B;">Oct 17 · bought for $48 each</span></span>
+        <span style="font-size: 12px; font-weight: 600; height: 24px; padding: 0 8px; border-radius: 999px; background: #F3F3F1; display: inline-flex; align-items: center;">Scanned in</span>
+      </div>
+    </sc-if>
+  </div>
+
+  <nav aria-label="Main" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 8px 8px 30px; border-top: 1px solid #E4E4E0; background: #FFFFFF;">
+    <a href="App-Tickets.dc.html" aria-current="page" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 700; color: #111113; background: #F3F3F1;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4z"/></svg>My Tickets</a>
+    <a href="App-Dashboard.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+    <a href="App-Home.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="App-Inbox.dc.html" aria-label="Inbox, 5 new" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5L6 5.5h12l2.5 8V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></svg>Inbox<span style="position: absolute; top: 2px; left: 54%; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; background: #0A7D50; color: #FFFFFF; font-size: 10px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #FFFFFF;">5</span></a>
+    <a href="App-Sell.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 600; color: #0A7D50;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Sell</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'Upcoming' }; }
+  renderVals() {
+    const tab = this.state.tab;
+    const tl = [['Upcoming', 'Upcoming'], ['Selling', 'Selling'], ['Past', 'Past']].map((p) => ({
+      label: p[1],
+      pressed: p[0] === tab ? 'true' : 'false',
+      style: 'height: 38px; border: 0; border-radius: 10px; cursor: pointer; font: ' + (p[0] === tab ? '700' : '500') + ' 14px/1 Instrument Sans, sans-serif; ' + (p[0] === tab ? 'background: #FFFFFF; color: #111113; box-shadow: 0 1px 3px rgba(17,17,19,0.15);' : 'background: transparent; color: #63636B;'),
+      pick: () => this.setState({ tab: p[0] })
+    }));
+    const tabs = { up: tl[0], sell: tl[1], past: tl[2] };
+    return { tabs: tabs, isUpcoming: tab === 'Upcoming', isSelling: tab === 'Selling', isPast: tab === 'Past' };
+  }
+}
+</script>
+</body>
+</html>

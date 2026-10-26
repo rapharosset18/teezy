@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy dashboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 1690px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column; gap: 22px; padding: 56px 16px 0; box-sizing: border-box;">
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <a href="App-Drawer.dc.html" aria-label="Open profile" style="width: 40px; height: 40px; border-radius: 999px; background: #111113; color: #FFFFFF; display: grid; place-items: center; font-size: 15px; font-weight: 700; flex-shrink: 0; margin-right: 4px;">R</a>
+    <h1 style="margin: 0; flex-grow: 1; font-size: 28px; font-weight: 700; letter-spacing: -0.03em;">Dashboard</h1>
+    <a href="App-Search.dc.html" aria-label="Search orders and events" style="width: 44px; height: 44px; border-radius: 999px; background: #F3F3F1; display: grid; place-items: center;">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+    </a>
+  </div>
+
+  <section aria-label="Club memberships" style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Memberships</h2>
+      <a href="App-Passes.dc.html" style="font-size: 14px; font-weight: 600; color: #0A7D50;">Dues and passes</a>
+    </div>
+    <div style="display: flex; flex-direction: column; border-radius: 18px; border: 1.5px solid #E4E4E0; overflow: hidden;">
+      <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid #E4E4E0;">
+        <span style="width: 44px; height: 44px; border-radius: 12px; background: #6B2D3A; color: #FFFFFF; display: grid; place-items: center; font-size: 13px; font-weight: 700;">ΣΦΕ</span>
+        <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 15px; font-weight: 600;">Sig Ep</span>
+          <span style="font-size: 13px; color: #63636B;">Active member · $350 due Nov 15</span>
+        </span>
+        <a href="App-Passes.dc.html" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #0A7D50; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700;">Pay</a>
+      </div>
+      <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid #E4E4E0;">
+        <span style="width: 44px; height: 44px; border-radius: 12px; background: #2F4A3C; color: #FFFFFF; display: grid; place-items: center; font-size: 12px; font-weight: 700;">SKI</span>
+        <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 15px; font-weight: 600;">Ski and Snowboard Club</span>
+          <span style="font-size: 13px; color: #63636B;">Member · paid through Dec 18</span>
+        </span>
+        <span style="height: 24px; padding: 0 9px; border-radius: 999px; background: #E3F3EB; color: #0A6542; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center;">Active</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px;">
+        <span style="width: 44px; height: 44px; border-radius: 12px; background: #1F2A44; color: #FFFFFF; display: grid; place-items: center; font-size: 12px; font-weight: 700;">FC</span>
+        <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 15px; font-weight: 600;">Club Soccer</span>
+          <span style="font-size: 13px; color: #63636B;">Expired Aug 31 · spring tryouts Jan 20</span>
+        </span>
+        <a href="App-Passes.dc.html" style="height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; font-size: 14px; font-weight: 600;">Renew</a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Your money" style="display: flex; flex-direction: column; gap: 16px; padding: 18px; border-radius: 22px; border: 1.5px solid #E4E4E0;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px;">
+      <div>
+        <p style="margin: 0; font-size: 14px; font-weight: 600; color: #63636B;">Ready to cash out</p>
+        <p style="margin: 4px 0 0; font-size: 40px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums;">$40.00</p>
+      </div>
+      <a href="App-Dashboard.dc.html" style="height: 44px; padding: 0 18px; border-radius: 999px; background: #0A7D50; color: #FFFFFF; display: flex; align-items: center; font-size: 15px; font-weight: 700;">Cash out</a>
+    </div>
+
+    <div role="img" aria-label="Money split: $155.40 in escrow, $152.00 on the way, $40.00 ready" style="display: flex; gap: 3px; height: 12px;">
+      <span style="flex: 155.4; border-radius: 999px 2px 2px 999px; background: #111113;"></span>
+      <span style="flex: 152; border-radius: 2px; background: #9BCBB3;"></span>
+      <span style="flex: 40; border-radius: 2px 999px 999px 2px; background: #0A7D50;"></span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: start;">
+        <span style="width: 12px; height: 12px; border-radius: 4px; background: #111113; margin-top: 4px;"></span>
+        <span><span style="display: block; font-size: 15px; font-weight: 600;">Held in escrow</span><span style="display: block; font-size: 13px; color: #63636B;">Your tickets from Maya. Refunded if they fail.</span></span>
+        <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;">$155.40</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: start;">
+        <span style="width: 12px; height: 12px; border-radius: 4px; background: #9BCBB3; margin-top: 4px;"></span>
+        <span><span style="display: block; font-size: 15px; font-weight: 600;">On the way to you</span><span style="display: block; font-size: 13px; color: #63636B;">2 sales. Released 2 hours after each event.</span></span>
+        <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;">$152.00</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: start;">
+        <span style="width: 12px; height: 12px; border-radius: 4px; background: #0A7D50; margin-top: 4px;"></span>
+        <span><span style="display: block; font-size: 15px; font-weight: 600;">Ready</span><span style="display: block; font-size: 13px; color: #63636B;">Cash out to Chase ••4417 anytime.</span></span>
+        <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;">$40.00</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Needs you" style="display: flex; flex-direction: column; gap: 10px;">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Needs you <span style="font-size: 15px; font-weight: 600; color: #0A7D50;">2</span></h2>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; background: #E3F3EB;">
+      <span style="flex-grow: 1; min-width: 0;"><span style="display: block; font-size: 15px; font-weight: 600;">Send Leo his ticket</span><span style="display: block; font-size: 13px; color: #33463C;">USC vs UCLA · sold yesterday · by Wed</span></span>
+      <a href="App-Tickets.dc.html" style="height: 40px; padding: 0 14px; border-radius: 999px; background: #0A7D50; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700;">Transfer</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; background: #F3F3F1;">
+      <span style="flex-grow: 1; min-width: 0;"><span style="display: block; font-size: 15px; font-weight: 600;">Maya countered at $74</span><span style="display: block; font-size: 13px; color: #63636B;">USC vs Notre Dame · 23h left</span></span>
+      <a href="App-Chat.dc.html" style="height: 40px; padding: 0 14px; border-radius: 999px; background: #111113; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700;">Reply</a>
+    </div>
+  </section>
+
+  <section aria-label="At a glance" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+    <a href="App-Tickets.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 16px; border: 1.5px solid #E4E4E0;">
+      <span style="font-size: 14px; font-weight: 600; color: #63636B;">Orders</span>
+      <span style="font-size: 28px; font-weight: 700; line-height: 1.1;">3</span>
+      <span style="font-size: 13px; color: #63636B;">2 upcoming</span>
+    </a>
+    <a href="App-Tickets.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 16px; border: 1.5px solid #E4E4E0;">
+      <span style="font-size: 14px; font-weight: 600; color: #63636B;">Listings</span>
+      <span style="font-size: 28px; font-weight: 700; line-height: 1.1;">2</span>
+      <span style="font-size: 13px; color: #63636B;">31 views this week</span>
+    </a>
+    <a href="App-Dashboard.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 16px; border: 1.5px solid #E4E4E0;">
+      <span style="font-size: 14px; font-weight: 600; color: #63636B;">Sales</span>
+      <span style="font-size: 28px; font-weight: 700; line-height: 1.1;">$288</span>
+      <span style="font-size: 13px; color: #63636B;">This semester</span>
+    </a>
+    <a href="App-Saved.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 16px; border: 1.5px solid #E4E4E0;">
+      <span style="font-size: 14px; font-weight: 600; color: #63636B;">Offers</span>
+      <span style="font-size: 28px; font-weight: 700; line-height: 1.1;">3</span>
+      <span style="font-size: 13px; color: #0A7D50; font-weight: 600;">1 counter waiting</span>
+    </a>
+  </section>
+
+  <section aria-label="Activity" style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Activity</h2>
+      <a href="App-Dashboard.dc.html" style="font-size: 14px; font-weight: 600; color: #0A7D50;">Download</a>
+    </div>
+    <div style="display: flex; gap: 8px; overflow: hidden;">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+        <button onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}">{{f.label}}</button>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+        <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid #E4E4E0;">
+          <span style="{{r.badge}}">{{r.icon}}</span>
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 15px; font-weight: 600;">{{r.title}}</span>
+            <span style="font-size: 13px; color: #63636B;">{{r.meta}}</span>
+          </span>
+          <span style="{{r.amtStyle}}">{{r.amt}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <nav aria-label="Main" style="margin: auto -16px 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 8px 8px 30px; border-top: 1px solid #E4E4E0; background: #FFFFFF;">
+    <a href="App-Tickets.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4z"/></svg>My Tickets</a>
+    <a href="App-Dashboard.dc.html" aria-current="page" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 700; color: #111113; background: #F3F3F1;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+    <a href="App-Home.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="App-Inbox.dc.html" aria-label="Inbox, 5 new" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5L6 5.5h12l2.5 8V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></svg>Inbox<span style="position: absolute; top: 2px; left: 54%; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; background: #0A7D50; color: #FFFFFF; font-size: 10px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #FFFFFF;">5</span></a>
+    <a href="App-Sell.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 600; color: #0A7D50;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Sell</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1690}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { f: 'All' }; }
+  renderVals() {
+    const f = this.state.f;
+    const filters = ['All', 'Sales', 'Purchases', 'Offers', 'Payouts'].map((label) => ({
+      label: label,
+      pressed: label === f ? 'true' : 'false',
+      style: 'flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 999px; cursor: pointer; font: 600 14px/1 Instrument Sans, sans-serif; ' + (label === f ? 'border: 0; background: #111113; color: #FFFFFF;' : 'border: 1.5px solid #E4E4E0; background: #FFFFFF; color: #111113;'),
+      pick: () => this.setState({ f: label })
+    }));
+    const badge = (bg, fg) => 'width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: ' + bg + '; color: ' + fg + ';';
+    const all = [
+      { type: 'Sales', icon: 'SOLD', title: 'Sold 1 ticket to Sam', meta: 'Oct 17 · USC vs Arizona · ready', amt: '+$40.00', up: true },
+      { type: 'Purchases', icon: 'BUY', title: '2 tickets from Maya', meta: 'Oct 22 · USC vs Notre Dame · in escrow', amt: '-$155.40', up: false },
+      { type: 'Offers', icon: 'OFR', title: 'Offered $35 to Jordan', meta: 'Oct 21 · USC vs UCLA · waiting', amt: '$35.00', up: null },
+      { type: 'Sales', icon: 'SOLD', title: 'Sold 2 tickets to Ana', meta: 'Oct 19 · USC vs Oregon · on the way', amt: '+$152.00', up: true },
+      { type: 'Payouts', icon: 'OUT', title: 'Cashed out to Chase ••4417', meta: 'Oct 12 · arrived Oct 13', amt: '-$96.00', up: false },
+      { type: 'Sales', icon: 'CR', title: 'Referral credit', meta: 'Oct 10 · Theo joined Teezy', amt: '+$5.00', up: true }
+    ];
+    const rows = all.filter((r) => f === 'All' || r.type === f).map((r) => ({
+      icon: r.icon, title: r.title, meta: r.meta, amt: r.amt,
+      badge: r.type === 'Sales' ? badge('#E3F3EB', '#0A6542') : r.type === 'Payouts' ? badge('#111113', '#FFFFFF') : badge('#F3F3F1', '#111113'),
+      amtStyle: 'font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: ' + (r.up === true ? '#0A7D50' : r.up === null ? '#63636B' : '#111113') + ';'
+    }));
+    return { filters: filters, rows: rows };
+  }
+}
+</script>
+</body>
+</html>

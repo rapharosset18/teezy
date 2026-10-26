@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy location and dates</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #5B5B60; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <a href="App-Home.dc.html" aria-label="Close" style="flex-grow: 1; min-height: 64px;"></a>
+  <div style="background: #FFFFFF; border-radius: 28px 28px 0 0; padding: 10px 16px 34px; display: flex; flex-direction: column; gap: 18px;">
+    <span style="align-self: center; width: 40px; height: 4px; border-radius: 999px; background: #D6D6D2;"></span>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">Where</h2>
+      <button onClick="{{useHere}}" style="{{hereStyle}}">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"/></svg>
+        <span style="flex-grow: 1; text-align: left;"><span style="display: block; font-size: 16px; font-weight: 600;">Near me</span><span style="display: block; font-size: 13px; opacity: 0.8;">USC, University Park · Los Angeles</span></span>
+      </button>
+      <label for="city" style="display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 14px; background: #F3F3F1; color: #63636B;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+        <input id="city" type="search" placeholder="Another city or campus" style="flex-grow: 1; min-width: 0; border: 0; background: transparent; font: 400 16px/1 Instrument Sans, sans-serif; color: #111113; outline: none;">
+      </label>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;">
+        <sc-for list="{{radii}}" as="r" hint-placeholder-count="4">
+          <button onClick="{{r.pick}}" aria-pressed="{{r.pressed}}" style="{{r.style}}">{{r.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">When</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{whens}}" as="w" hint-placeholder-count="5">
+          <button onClick="{{w.pick}}" aria-pressed="{{w.pressed}}" style="{{w.style}}">{{w.label}}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{showCal}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; border: 1.5px solid #E4E4E0;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 15px; font-weight: 700;">November 2026</span>
+            <span style="font-size: 13px; color: #63636B;">Sat 7 – Sun 8</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; font-size: 12px; font-weight: 600; color: #63636B;">
+            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px;">
+            <sc-for list="{{days}}" as="d" hint-placeholder-count="21">
+              <span style="{{d.style}}">{{d.n}}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px;">
+      <button onClick="{{reset}}" style="height: 54px; padding: 0 18px; border-radius: 999px; border: 1.5px solid #E4E4E0; background: #FFFFFF; color: #111113; font: 600 16px/1 Instrument Sans, sans-serif; cursor: pointer;">Reset</button>
+      <a href="App-Home.dc.html" style="height: 54px; border-radius: 999px; background: #111113; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700;">Show {{count}} events</a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { here: true, radius: '5 mi', when: 'Pick dates' }; }
+  renderVals() {
+    const s = this.state;
+    const chip = (on) => 'height: 40px; padding: 0 14px; border-radius: 999px; cursor: pointer; font: 600 14px/1 Instrument Sans, sans-serif; ' + (on ? 'border: 0; background: #111113; color: #FFFFFF;' : 'border: 1.5px solid #E4E4E0; background: #FFFFFF; color: #111113;');
+    const radii = ['1 mi', '5 mi', '25 mi', 'Any'].map((r) => ({ label: r, pressed: r === s.radius ? 'true' : 'false', style: chip(r === s.radius) + ' padding: 0;', pick: () => this.setState({ radius: r }) }));
+    const whens = ['Today', 'This weekend', 'This week', 'This month', 'Pick dates'].map((w) => ({ label: w, pressed: w === s.when ? 'true' : 'false', style: chip(w === s.when), pick: () => this.setState({ when: w }) }));
+    const days = [];
+    for (let i = 1; i <= 21; i++) {
+      const sel = i === 7 || i === 8;
+      const past = false;
+      days.push({ n: String(i), style: 'height: 34px; display: grid; place-items: center; font-size: 14px; font-variant-numeric: tabular-nums; border-radius: ' + (i === 7 ? '999px 0 0 999px' : i === 8 ? '0 999px 999px 0' : '999px') + '; ' + (sel ? 'background: #0A7D50; color: #FFFFFF; font-weight: 700;' : 'color: #111113;') });
+    }
+    const base = { '1 mi': 6, '5 mi': 23, '25 mi': 58, 'Any': 140 }[s.radius];
+    const mult = { 'Today': 0.2, 'This weekend': 0.5, 'This week': 1, 'This month': 3, 'Pick dates': 0.45 }[s.when];
+    return {
+      radii: radii, whens: whens, days: days,
+      showCal: s.when === 'Pick dates',
+      count: Math.max(1, Math.round(base * mult)),
+      useHere: () => this.setState({ here: !s.here }),
+      hereStyle: 'display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; cursor: pointer; font-family: Instrument Sans, sans-serif; ' + (s.here ? 'border: 1.5px solid #0A7D50; background: #E3F3EB; color: #0A5A3A;' : 'border: 1.5px solid #E4E4E0; background: #FFFFFF; color: #111113;'),
+      reset: () => this.setState({ here: true, radius: '5 mi', when: 'This week' })
+    };
+  }
+}
+</script>
+</body>
+</html>

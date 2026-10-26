@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy register an organization</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 1240px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column; padding: 56px 16px 34px; box-sizing: border-box; gap: 20px;">
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <a href="App-Drawer.dc.html" aria-label="Back" style="width: 40px; height: 44px; display: grid; place-items: center; margin-left: -8px;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <span style="font-size: 14px; color: #63636B;">Step 1 of 2</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <h1 style="margin: 0; font-size: 30px; line-height: 1.08; font-weight: 700; letter-spacing: -0.03em;">Register an organization</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 22px; color: #3F4045;">Sell tickets to your events as your club, frat or sorority. Buyers see your org name with a verified badge.</p>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <span style="font-size: 15px; font-weight: 600;">What kind of organization?</span>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <sc-for list="{{types}}" as="t" hint-placeholder-count="5">
+        <button onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="{{t.style}}">{{t.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <label for="orgName" style="font-size: 15px; font-weight: 600;">Organization name</label>
+      <input id="orgName" type="text" value="Sigma Phi Epsilon, USC chapter" style="height: 50px; padding: 0 14px; border-radius: 14px; border: 1.5px solid #E4E4E0; background: #FFFFFF; font: 400 16px/1 Instrument Sans, sans-serif; color: #111113; outline: none;">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <label for="orgRole" style="font-size: 15px; font-weight: 600;">Your role</label>
+      <input id="orgRole" type="text" value="Social chair" style="height: 50px; padding: 0 14px; border-radius: 14px; border: 1.5px solid #E4E4E0; background: #FFFFFF; font: 400 16px/1 Instrument Sans, sans-serif; color: #111113; outline: none;">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <label for="orgEmail" style="font-size: 15px; font-weight: 600;">Organization email</label>
+      <input id="orgEmail" type="email" value="social@uscsigep.org" style="height: 50px; padding: 0 14px; border-radius: 14px; border: 1.5px solid #E4E4E0; background: #FFFFFF; font: 400 16px/1 Instrument Sans, sans-serif; color: #111113; outline: none;">
+      <span style="font-size: 13px; color: #63636B;">We send a code here to confirm you can use it.</span>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <span style="font-size: 15px; font-weight: 600;">Show you run it</span>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; border: 1.5px dashed #B9B9B3;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4M12 11v6M9 14l3-3 3 3"/></svg>
+      <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 15px; font-weight: 600;">Upload officer roster or letter</span>
+        <span style="font-size: 13px; color: #63636B;">We review it within 24 hours</span>
+      </span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; border: 1.5px solid #E4E4E0;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>
+      <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 15px; font-weight: 600;">Org bank account for payouts</span>
+        <span style="font-size: 13px; color: #63636B;">Ticket money goes to the org, not to you</span>
+      </span>
+      <a href="App-Org.dc.html" style="font-size: 14px; font-weight: 700; color: #0A7D50;">Connect</a>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 18px; background: #F3F3F1;">
+    <span style="font-size: 15px; font-weight: 700;">Once you're verified</span>
+    <sc-for list="{{perks}}" as="p" hint-placeholder-count="4">
+      <span style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 20px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0A7D50" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px;"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{p}}
+      </span>
+    </sc-for>
+  </div>
+
+  <a href="App-Drawer.dc.html" style="margin-top: auto; height: 54px; border-radius: 999px; background: #111113; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700;">Submit for review</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1240}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { type: 'Fraternity' }; }
+  renderVals() {
+    const cur = this.state.type;
+    const types = ['Fraternity', 'Sorority', 'Student club', 'Sports club', 'Other'].map((t) => ({
+      label: t,
+      pressed: t === cur ? 'true' : 'false',
+      style: 'height: 40px; padding: 0 16px; border-radius: 999px; cursor: pointer; font: 600 14px/1 Instrument Sans, sans-serif; ' + (t === cur ? 'border: 0; background: #111113; color: #FFFFFF;' : 'border: 1.5px solid #E4E4E0; background: #FFFFFF; color: #111113;'),
+      pick: () => this.setState({ type: t })
+    }));
+    return {
+      types: types,
+      perks: [
+        'Sell event tickets under your org name with a verified badge',
+        'Set ticket tiers, capacity and a guest list',
+        'Scan tickets at the door from your phone',
+        'Add other officers to manage events and payouts'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

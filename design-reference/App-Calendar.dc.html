@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy calendar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div style="flex-grow: 1; overflow: hidden; padding: 56px 16px 0; display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="App-Drawer.dc.html" aria-label="Open profile" style="width: 40px; height: 40px; border-radius: 999px; background: #111113; color: #FFFFFF; display: grid; place-items: center; font-size: 15px; font-weight: 700; flex-shrink: 0;">R</a>
+      <h1 style="margin: 0; flex-grow: 1; font-size: 28px; font-weight: 700; letter-spacing: -0.03em;">My Tickets</h1>
+      <div role="group" aria-label="View" style="display: flex; padding: 3px; border-radius: 12px; background: #F3F3F1;">
+        <a href="App-Tickets.dc.html" aria-label="List view" style="width: 40px; height: 34px; border-radius: 9px; display: grid; place-items: center; color: #63636B;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>
+        </a>
+        <a href="App-Calendar.dc.html" aria-label="Calendar view" aria-current="page" style="width: 40px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: #FFFFFF; box-shadow: 0 1px 3px rgba(17,17,19,0.15);">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <button aria-label="Previous month" style="width: 40px; height: 40px; border-radius: 999px; border: 0; background: #F3F3F1; color: #111113; display: grid; place-items: center; cursor: pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <span style="font-size: 18px; font-weight: 700;">November 2026</span>
+      <button aria-label="Next month" style="width: 40px; height: 40px; border-radius: 999px; border: 0; background: #F3F3F1; color: #111113; display: grid; place-items: center; cursor: pointer;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; font-size: 12px; font-weight: 600; color: #63636B;">
+        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 2px;">
+        <sc-for list="{{days}}" as="d" hint-placeholder-count="30">
+          <button onClick="{{d.pick}}" aria-label="{{d.label}}" aria-pressed="{{d.pressed}}" style="height: 46px; border: 0; background: transparent; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-family: Instrument Sans, sans-serif;">
+            <span style="{{d.numStyle}}">{{d.n}}</span>
+            <span style="display: flex; gap: 2px; height: 6px;">
+              <sc-for list="{{d.dots}}" as="dot" hint-placeholder-count="0">
+                <span style="{{dot}}"></span>
+              </sc-for>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: #3F4045;">
+      <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: #0A7D50;"></span>Going</span>
+      <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: #2B3A80;"></span>Friends going</span>
+      <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: #111113;"></span>Selling</span>
+      <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; box-sizing: border-box; border-radius: 999px; border: 1.5px solid #63636B;"></span>Watching</span>
+    </div>
+
+    <div style="height: 1px; background: #E4E4E0;"></div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700;">{{dayTitle}}</h2>
+      <sc-if value="{{noItems}}" hint-placeholder-val="{{ false }}">
+        <p style="margin: 0; font-size: 14px; color: #63636B;">Nothing planned. <a href="App-Home.dc.html" style="color: #0A7D50; font-weight: 600;">Find something to do</a></p>
+      </sc-if>
+      <sc-for list="{{items}}" as="i" hint-placeholder-count="2">
+        <a href="{{i.href}}" style="display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; background: #F7F7F5;">
+          <span style="font-size: 13px; font-weight: 600; color: #3F4045;">{{i.time}}</span>
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+            <span style="font-size: 15px; font-weight: 600;">{{i.title}}</span>
+            <span style="font-size: 13px; color: #63636B;">{{i.sub}}</span>
+          </span>
+          <span style="{{i.chip}}">{{i.kind}}</span>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 8px 8px 30px; border-top: 1px solid #E4E4E0; background: #FFFFFF;">
+    <a href="App-Tickets.dc.html" aria-current="page" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 700; color: #111113; background: #F3F3F1;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4z"/></svg>My Tickets</a>
+    <a href="App-Dashboard.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+    <a href="App-Home.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="App-Inbox.dc.html" aria-label="Inbox, 5 new" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5L6 5.5h12l2.5 8V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></svg>Inbox<span style="position: absolute; top: 2px; left: 54%; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; background: #0A7D50; color: #FFFFFF; font-size: 10px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #FFFFFF;">5</span></a>
+    <a href="App-Sell.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 600; color: #0A7D50;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Sell</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { day: 7 }; }
+  renderVals() {
+    const sel = this.state.day;
+    const chip = (bg, fg) => 'height: 24px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; white-space: nowrap; background: ' + bg + '; color: ' + fg + ';';
+    const K = {
+      going: { kind: 'Going', chip: chip('#E3F3EB', '#0A6542'), dot: '#0A7D50' },
+      friends: { kind: 'Friends', chip: chip('#E6E9F5', '#2B3A80'), dot: '#2B3A80' },
+      selling: { kind: 'Selling', chip: chip('#111113', '#FFFFFF'), dot: '#111113' },
+      watching: { kind: 'Watching', chip: chip('#F3F3F1', '#3F4045'), dot: 'ring' }
+    };
+    const plans = {
+      7: [
+        { k: 'going', time: '7:30 PM', title: 'USC vs Notre Dame', sub: 'Coliseum · Sec 112 · 2 tickets', href: 'App-Tickets.dc.html' },
+        { k: 'friends', time: '10:30 PM', title: 'Delta Gamma afterparty', sub: 'Theo, Ana and 4 friends', href: 'App-Friends.dc.html' }
+      ],
+      12: [
+        { k: 'selling', time: '7:00 PM', title: 'USC vs UCLA', sub: 'Sold to Leo · send by Wed', href: 'App-Dashboard.dc.html' },
+        { k: 'friends', time: '7:00 PM', title: 'USC vs UCLA', sub: 'Nico and 2 friends', href: 'App-Friends.dc.html' }
+      ],
+      13: [
+        { k: 'going', time: '9:00 PM', title: 'Sig Ep Fall Formal', sub: 'The Mayan · 1 ticket', href: 'App-Tickets.dc.html' },
+        { k: 'friends', time: '9:00 PM', title: 'Sig Ep Fall Formal', sub: '4 friends going', href: 'App-Friends.dc.html' }
+      ],
+      21: [
+        { k: 'selling', time: '5:00 PM', title: 'USC vs Oregon', sub: 'Sold to Ana · paid after the game', href: 'App-Dashboard.dc.html' }
+      ],
+      22: [
+        { k: 'watching', time: '1:00 PM', title: 'Volleyball senior night', sub: 'Galen Center · from $8', href: 'App-Saved.dc.html' }
+      ],
+      27: [
+        { k: 'friends', time: '9:00 PM', title: 'Thanksgiving Eve rooftop', sub: 'Nico and 2 friends', href: 'App-Friends.dc.html' }
+      ]
+    };
+    const days = [];
+    for (let n = 1; n <= 30; n++) {
+      const p = plans[n] || [];
+      const kinds = [];
+      p.forEach((x) => { if (kinds.indexOf(x.k) < 0) kinds.push(x.k); });
+      const dots = kinds.map((k) => K[k].dot === 'ring' ? 'width: 6px; height: 6px; box-sizing: border-box; border-radius: 999px; border: 1.5px solid #63636B;' : 'width: 6px; height: 6px; border-radius: 999px; background: ' + K[k].dot + ';');
+      const isSel = n === sel;
+      const isToday = false;
+      days.push({
+        n: String(n),
+        label: 'November ' + n + (p.length ? ', ' + p.length + ' plans' : ''),
+        pressed: isSel ? 'true' : 'false',
+        dots: dots,
+        numStyle: 'width: 32px; height: 32px; border-radius: 999px; display: grid; place-items: center; font-size: 15px; font-variant-numeric: tabular-nums; ' + (isSel ? 'background: #111113; color: #FFFFFF; font-weight: 700;' : 'color: #111113; font-weight: ' + (p.length ? '700' : '400') + ';'),
+        pick: () => this.setState({ day: n })
+      });
+    }
+    const dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][(sel - 1) % 7];
+    const items = (plans[sel] || []).map((x) => ({ time: x.time, title: x.title, sub: x.sub, href: x.href, kind: K[x.k].kind, chip: K[x.k].chip }));
+    return { days: days, items: items, noItems: items.length === 0, dayTitle: dow + ', Nov ' + sel };
+  }
+}
+</script>
+</body>
+</html>

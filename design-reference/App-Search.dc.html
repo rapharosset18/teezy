@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy search</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: 'Instrument Sans', system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div style="padding: 56px 16px 12px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #E4E4E0;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <label for="q" style="flex-grow: 1; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #111113;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+        <input id="q" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Search events, teams, parties" style="flex-grow: 1; min-width: 0; border: 0; background: transparent; font: 400 16px/1 'Instrument Sans', sans-serif; color: #111113; outline: none;">
+      </label>
+      <a href="App-Home.dc.html" style="font-size: 15px; font-weight: 600; padding: 8px 0;">Cancel</a>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="App-Where.dc.html" style="display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 999px; background: #F3F3F1; font-size: 14px; font-weight: 600;">Near USC · 5 mi</a>
+      <a href="App-Where.dc.html" style="display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 999px; background: #F3F3F1; font-size: 14px; font-weight: 600;">Any date</a>
+      <button style="display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 999px; border: 0; background: #F3F3F1; color: #111113; font: 600 14px/1 'Instrument Sans', sans-serif; cursor: pointer;">Under $100</button>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; overflow: hidden; padding: 6px 16px 0;">
+    <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+      <p style="margin: 14px 0 6px; font-size: 13px; font-weight: 600; color: #63636B;">Recent</p>
+      <sc-for list="{{recent}}" as="r" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E4E4E0; font-size: 16px;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#63636B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>{{r}}
+        </div>
+      </sc-for>
+    </sc-if>
+    <sc-if value="{{hasQ}}" hint-placeholder-val="{{ true }}">
+      <p style="margin: 14px 0 6px; font-size: 13px; font-weight: 600; color: #63636B;">Teams and organizers</p>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0;">
+        <span style="width: 44px; height: 44px; border-radius: 12px; background: #1F2A44; color: #FFFFFF; display: grid; place-items: center; font-size: 14px; font-weight: 700;">FB</span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 16px; font-weight: 600;">USC Trojans Football</span><span style="font-size: 13px; color: #63636B;">4 home games · 112 tickets for sale</span></span>
+        <button aria-label="Add to watchlist" style="width: 44px; height: 44px; border-radius: 999px; border: 1.5px solid #E4E4E0; background: #FFFFFF; display: grid; place-items: center; cursor: pointer;"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#111113" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0;">
+        <span style="width: 44px; height: 44px; border-radius: 12px; background: #2F4A3C; color: #FFFFFF; display: grid; place-items: center; font-size: 14px; font-weight: 700;">BB</span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px;"><span style="font-size: 16px; font-weight: 600;">USC Trojans Basketball</span><span style="font-size: 13px; color: #63636B;">9 games · 41 tickets for sale</span></span>
+        <button aria-label="In your watchlist" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E3F3EB; display: grid; place-items: center; cursor: pointer;"><svg viewBox="0 0 24 24" width="20" height="20" fill="#0A7D50" stroke="#0A7D50" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+      </div>
+
+      <p style="margin: 18px 0 6px; font-size: 13px; font-weight: 600; color: #63636B;">Events</p>
+      <sc-for list="{{events}}" as="e" hint-placeholder-count="4">
+        <a href="App-Search.dc.html" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid #E4E4E0;">
+          <span style="width: 52px; height: 56px; border-radius: 12px; background: #F3F3F1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+            <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: #63636B;">{{e.mon}}</span>
+            <span style="font-size: 20px; font-weight: 700; line-height: 1;">{{e.day}}</span>
+          </span>
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 16px; font-weight: 600;">{{e.name}}</span>
+            <span style="font-size: 13px; color: #63636B;">{{e.place}}</span>
+          </span>
+          <span style="font-size: 15px; font-weight: 700;">{{e.from}}</span>
+        </a>
+      </sc-for>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { q: 'usc' }; }
+  renderVals() {
+    const q = this.state.q;
+    return {
+      q: q,
+      onQ: (e) => this.setState({ q: e.target.value }),
+      empty: q.trim() === '',
+      hasQ: q.trim() !== '',
+      recent: ['USC vs UCLA', 'Halloween parties', 'Hollywood Bowl'],
+      events: [
+        { mon: 'NOV', day: '07', name: 'USC vs Notre Dame', place: 'Coliseum · Sat 7:30 PM', from: '$62+' },
+        { mon: 'NOV', day: '12', name: 'USC vs UCLA · Basketball', place: 'Galen Center · Thu 7 PM', from: '$40+' },
+        { mon: 'NOV', day: '21', name: 'USC vs Oregon', place: 'Coliseum · Sat 5 PM', from: '$55+' },
+        { mon: 'NOV', day: '22', name: 'USC Volleyball · Senior night', place: 'Galen Center · Sun 1 PM', from: '$8+' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

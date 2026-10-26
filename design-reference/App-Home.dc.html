@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div style="flex-grow: 1; overflow: hidden; padding: 56px 0 0; display: flex; flex-direction: column; gap: 16px;">
+    <div style="padding: 0 16px; display: flex; align-items: center; gap: 8px;">
+      <a href="App-Drawer.dc.html" aria-label="Open profile, 2 friend requests" style="position: relative; width: 40px; height: 40px; border-radius: 999px; background: #111113; color: #FFFFFF; display: grid; place-items: center; font-size: 15px; font-weight: 700; flex-shrink: 0;">R<span style="position: absolute; top: -1px; right: -1px; width: 12px; height: 12px; border-radius: 999px; background: #0A7D50; box-shadow: 0 0 0 2px #FFFFFF;"></span></a>
+      <a href="App-Where.dc.html" style="display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border-radius: 999px; background: #F3F3F1; font-size: 15px; font-weight: 600; min-width: 0;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        Near USC
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+      <a href="App-Where.dc.html" style="display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border-radius: 999px; background: #F3F3F1; font-size: 15px; font-weight: 600;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+        This week
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+    </div>
+
+    <div style="padding: 0 16px;">
+      <a href="App-Search.dc.html" style="display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #E4E4E0; color: #63636B; font-size: 16px;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#111113" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+        Search events, teams, parties
+      </a>
+    </div>
+
+    <div style="padding: 0 16px; display: flex; gap: 8px; overflow: hidden;">
+      <sc-for list="{{cats}}" as="c" hint-placeholder-count="5">
+        <button onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button>
+      </sc-for>
+    </div>
+
+    <div style="padding: 0 16px;">
+      <a href="App-Saved.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: #E3F3EB;">
+        <span style="width: 36px; height: 36px; border-radius: 999px; background: #0A7D50; color: #FFFFFF; display: grid; place-items: center; flex-shrink: 0;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h12l-3-3M20 15H8l3 3"/></svg>
+        </span>
+        <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+          <span style="font-size: 15px; font-weight: 600;">3 offers out · 1 counter</span>
+          <span style="font-size: 13px; color: #33463C;">Maya countered at $74 for USC vs ND</span>
+        </span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0A7D50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="padding: 0 16px; display: flex; justify-content: space-between; align-items: baseline;">
+        <h2 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Your watchlist</h2>
+        <a href="App-Saved.dc.html" style="font-size: 14px; font-weight: 600; color: #0A7D50;">See all</a>
+      </div>
+      <div style="display: flex; gap: 10px; padding: 0 16px; overflow: hidden;">
+        <sc-for list="{{watch}}" as="w" hint-placeholder-count="3">
+          <a href="App-Saved.dc.html" style="width: 146px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
+            <span style="{{w.tile}}">
+              <span style="font-size: 22px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; white-space: pre-line;">{{w.short}}</span>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" style="position: absolute; top: 10px; right: 10px;"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+            </span>
+            <span style="display: flex; flex-direction: column; gap: 1px;">
+              <span style="font-size: 14px; font-weight: 600;">{{w.name}}</span>
+              <span style="font-size: 13px; color: #63636B;">{{w.meta}}</span>
+            </span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="padding: 0 16px; display: flex; flex-direction: column;">
+      <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Near USC this week</h2>
+      <sc-for list="{{near}}" as="e" hint-placeholder-count="2">
+        <a href="App-Search.dc.html" style="display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid #E4E4E0;">
+          <span style="width: 52px; height: 56px; border-radius: 12px; background: #F3F3F1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+            <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: #63636B;">{{e.dow}}</span>
+            <span style="font-size: 20px; font-weight: 700; line-height: 1;">{{e.day}}</span>
+          </span>
+          <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 16px; font-weight: 600;">{{e.name}}</span>
+            <span style="font-size: 13px; color: #63636B;">{{e.place}}</span>
+          </span>
+          <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;">{{e.from}}</span>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 8px 8px 30px; border-top: 1px solid #E4E4E0; background: #FFFFFF;">
+    <a href="App-Tickets.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4z"/></svg>My Tickets</a>
+    <a href="App-Dashboard.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+    <a href="App-Home.dc.html" aria-current="page" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 700; color: #111113; background: #F3F3F1;"><svg viewBox="0 0 24 24" width="24" height="24" fill="#111113" stroke="#111113" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="App-Inbox.dc.html" aria-label="Inbox, 5 new" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5L6 5.5h12l2.5 8V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></svg>Inbox<span style="position: absolute; top: 2px; left: 54%; min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; background: #0A7D50; color: #FFFFFF; font-size: 10px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #FFFFFF;">5</span></a>
+    <a href="App-Sell.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 600; color: #0A7D50;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Sell</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { cat: 'All' }; }
+  renderVals() {
+    const cat = this.state.cat;
+    const cats = ['All', 'Sports', 'Parties', 'Concerts', 'Comedy'].map((label) => ({
+      label: label,
+      pressed: label === cat ? 'true' : 'false',
+      style: 'flex-shrink: 0; height: 36px; padding: 0 16px; border-radius: 999px; cursor: pointer; font: 600 14px/1 Instrument Sans, sans-serif; ' + (label === cat ? 'border: 0; background: #111113; color: #FFFFFF;' : 'border: 1.5px solid #E4E4E0; background: #FFFFFF; color: #111113;'),
+      pick: () => this.setState({ cat: label })
+    }));
+    const tile = (bg) => 'position: relative; height: 110px; border-radius: 14px; padding: 12px; box-sizing: border-box; display: flex; align-items: flex-end; color: #FFFFFF; background: ' + bg + ';';
+    return {
+      cats: cats,
+      watch: [
+        { short: 'USC\nvs UCLA', name: 'USC vs UCLA', meta: 'Thu 11/12 · from $40', tile: tile('#1F2A44') },
+        { short: 'Fall\nFormal', name: 'Sig Ep Fall Formal', meta: 'Fri 11/13 · from $25', tile: tile('#6B2D3A') },
+        { short: 'USC\nvs ORE', name: 'USC vs Oregon', meta: 'Sat 11/21 · from $55', tile: tile('#2F4A3C') }
+      ],
+      near: [
+        { dow: 'SAT', day: '07', name: 'USC vs Notre Dame', place: 'Coliseum · 0.4 mi', from: '$62+' },
+        { dow: 'SUN', day: '08', name: 'Trojan Night DJ set', place: 'The Mayan · 3.1 mi', from: '$30+' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

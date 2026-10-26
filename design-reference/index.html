@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teezy redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+  :root { --bg:#F3F3F1; --ink:#111113; --muted:#63636B; --border:#E4E4E0; --green:#0A7D50; --tint:#E3F3EB; --warn:#FFF4E0; --warn-ink:#7A4B00; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 'Instrument Sans', system-ui, sans-serif; }
+  header { padding: 32px 16px 8px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 28px; letter-spacing: -0.03em; margin: 0 0 6px; }
+  header p { color: var(--muted); margin: 0; max-width: 720px; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  nav a { color: var(--ink); text-decoration: none; background: #fff; border: 1.5px solid var(--border); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 14px; }
+  nav a:hover { border-color: var(--ink); }
+  section { max-width: 1400px; margin: 0 auto; padding: 24px 16px 8px; }
+  h2 { font-size: 20px; letter-spacing: -0.02em; margin: 0 0 14px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 28px; }
+  figure { margin: 0; width: 390px; max-width: 100%; }
+  figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+  figcaption b { font-size: 16px; }
+  figcaption a { color: var(--green); font-weight: 600; font-size: 13px; text-decoration: none; }
+  .note { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+  .flag { font-size: 13px; background: var(--warn); color: var(--warn-ink); border-radius: 10px; padding: 6px 10px; margin: 0 0 8px; }
+  .phone { width: 390px; max-width: 100%; height: 844px; border-radius: 28px; overflow: hidden; background: #fff; border: 1.5px solid var(--border); }
+  .phone iframe { width: 390px; height: 100%; border: 0; display: block; }
+  .missing { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .card { background: #fff; border: 1.5px dashed #B9B9B3; border-radius: 16px; padding: 14px 16px; }
+  .card b { display: block; margin-bottom: 4px; }
+  .card span { color: var(--muted); font-size: 14px; }
+  .live { background: var(--tint); border-radius: 16px; padding: 14px 16px; max-width: 720px; }
+  .live a { color: var(--green); font-weight: 700; }
+  @media (max-width: 440px) { .phone, .phone iframe, figure { width: 100%; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Teezy redesign</h1>
+  <p>Every screen from the design files, rendered and clickable (chips, tabs and toggles work). Each phone scrolls on its own. Flags mark places where the design no longer matches decisions made since it was drawn.</p>
+  <nav>
+    <a href="#tabs">Main tabs</a>
+    <a href="#panels">Panel and sheet</a>
+    <a href="#pushed">Other screens</a>
+    <a href="#missing">Not designed yet</a>
+    <a href="#current">Current app</a>
+  </nav>
+</header>
+
+<section id="tabs">
+  <h2>Main tabs</h2>
+  <div class="grid">
+    <figure><figcaption><b>Home</b><a href="App-Home.dc.html" target="_blank">Open</a></figcaption>
+      <p class="flag">"Near USC" is the default location. Fine for launch, but it should follow where each user is.</p>
+      <div class="phone"><iframe src="App-Home.dc.html" title="Home" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>My Tickets</b><a href="App-Tickets.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Tickets.dc.html" title="My Tickets" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>My Tickets · Passes</b><a href="App-Passes.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Passes.dc.html" title="Passes" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>My Tickets · Calendar</b><a href="App-Calendar.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Calendar.dc.html" title="Calendar" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Dashboard</b><a href="App-Dashboard.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Dashboard.dc.html" title="Dashboard" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Inbox</b><a href="App-Inbox.dc.html" target="_blank">Open</a></figcaption>
+      <p class="note">The Teezy bell is where desired-ticket alerts should collect.</p>
+      <div class="phone"><iframe src="App-Inbox.dc.html" title="Inbox" loading="lazy"></iframe></div></figure>
+  </div>
+</section>
+
+<section id="panels">
+  <h2>Panel and sheet</h2>
+  <div class="grid">
+    <figure><figcaption><b>Profile panel</b><a href="App-Drawer.dc.html" target="_blank">Open</a></figcaption>
+      <p class="flag">Says "USC verified". Should be "email verified". It also has no place for Desired tickets or your budget yet.</p>
+      <div class="phone"><iframe src="App-Drawer.dc.html" title="Profile panel" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Where (location and dates)</b><a href="App-Where.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Where.dc.html" title="Where" loading="lazy"></iframe></div></figure>
+  </div>
+</section>
+
+<section id="pushed">
+  <h2>Other screens</h2>
+  <div class="grid">
+    <figure><figcaption><b>Search</b><a href="App-Search.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Search.dc.html" title="Search" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Saved (offers and watchlist)</b><a href="App-Saved.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Saved.dc.html" title="Saved" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Chat</b><a href="App-Chat.dc.html" target="_blank">Open</a></figcaption>
+      <p class="flag">Header says "USC verified". Should be "email verified".</p>
+      <div class="phone"><iframe src="App-Chat.dc.html" title="Chat" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Sell</b><a href="App-Sell.dc.html" target="_blank">Open</a></figcaption>
+      <p class="note">"Price per ticket" sets the place in line: changing it later re-queues the listing.</p>
+      <div class="phone"><iframe src="App-Sell.dc.html" title="Sell" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Friends</b><a href="App-Friends.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Friends.dc.html" title="Friends" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Shared album</b><a href="App-Album.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Album.dc.html" title="Shared album" loading="lazy"></iframe></div></figure>
+    <figure><figcaption><b>Register an organization</b><a href="App-Org.dc.html" target="_blank">Open</a></figcaption>
+      <div class="phone"><iframe src="App-Org.dc.html" title="Register an organization" loading="lazy"></iframe></div></figure>
+  </div>
+</section>
+
+<section id="missing">
+  <h2>Not designed yet</h2>
+  <p class="note">The backend supports these, but no mock exists, so today they use the old look.</p>
+  <div class="missing">
+    <div class="card"><b>Event / section page</b><span>The price slider: count of tickets available, good-deal markers and badge, "Buy at $X", "Seats don't need to be together". The core of the order book.</span></div>
+    <div class="card"><b>No match</b><span>"No seller at $X or less right now", with "Alert me at $X" and "Send an offer".</span></div>
+    <div class="card"><b>Checkout and escrow</b><span>After a match: pay within 5 minutes, then sent, received and paid out. One escrow per seller when split.</span></div>
+    <div class="card"><b>Desired tickets</b><span>List with pause and delete, plus the add form: event, section or any, quantity, max price.</span></div>
+    <div class="card"><b>Desired ticket alert</b><span>The push notification, and where it lands in the Inbox.</span></div>
+    <div class="card"><b>Sign in</b><span>Email, then a 6-digit code. Any email address works.</span></div>
+    <div class="card"><b>Budget</b><span>Max price per ticket in settings. It caps the slider.</span></div>
+    <div class="card"><b>Seller: edit price</b><span>Should warn that a new price moves the listing to the back of the line at that price.</span></div>
+  </div>
+</section>
+
+<section id="current">
+  <h2>Current app</h2>
+  <div class="live">The running app still uses the old design. With <code>npm run dev</code> running, open it at <a href="http://localhost:3000" target="_blank">localhost:3000</a> to compare.</div>
+</section>
+<div style="height:48px"></div>
+</body>
+</html>

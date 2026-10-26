@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy sell tickets</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div style="padding: 56px 16px 0; display: flex; flex-direction: column; gap: 18px; flex-grow: 1; overflow: hidden;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.03em;">Sell tickets</h1>
+      <a href="App-Home.dc.html" aria-label="Close" style="width: 40px; height: 40px; border-radius: 999px; background: #F3F3F1; display: grid; place-items: center;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-size: 15px; font-weight: 600;">Which tickets?</span>
+      <sc-for list="{{owned}}" as="o" hint-placeholder-count="2">
+        <button onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="{{o.style}}">
+          <span style="flex-grow: 1; text-align: left;">
+            <span style="display: block; font-size: 16px; font-weight: 600;">{{o.name}}</span>
+            <span style="display: block; margin-top: 2px; font-size: 13px; color: #63636B;">{{o.meta}}</span>
+          </span>
+          <span style="{{o.dot}}"></span>
+        </button>
+      </sc-for>
+      <a href="App-Sell.dc.html" style="display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 15px; font-weight: 600; color: #0A7D50;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Add tickets from Ticketmaster or AXS
+      </a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-size: 15px; font-weight: 600;">Price per ticket</span>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+        <sc-for list="{{prices}}" as="p" hint-placeholder-count="3">
+          <button onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">
+            <span style="display: block; font-size: 22px; font-weight: 700;">${{p.price}}</span>
+            <span style="display: block; margin-top: 4px; font-size: 13px; font-weight: 600;">{{p.label}}</span>
+            <span style="display: block; margin-top: 1px; font-size: 12px; opacity: 0.75;">{{p.speed}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <label for="takeOffers" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border-radius: 16px; background: #F3F3F1; cursor: pointer;">
+      <span>
+        <span style="display: block; font-size: 15px; font-weight: 600;">Accept offers</span>
+        <span style="display: block; margin-top: 2px; font-size: 13px; color: #63636B;">Buyers can message you a lower price</span>
+      </span>
+      <input id="takeOffers" type="checkbox" checked style="width: 22px; height: 22px; accent-color: #0A7D50;">
+    </label>
+  </div>
+
+  <div style="padding: 14px 16px 34px; border-top: 1px solid #E4E4E0; display: flex; flex-direction: column; gap: 10px;">
+    <div style="display: flex; justify-content: space-between; font-size: 15px;"><span style="color: #63636B;">You get, paid after the event</span><b style="font-variant-numeric: tabular-nums;">${{payout}}</b></div>
+    <a href="App-Tickets.dc.html" style="height: 54px; border-radius: 999px; background: #0A7D50; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700;">List {{qtyLabel}} at ${{price}}</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { ev: 'nd', price: 80 }; }
+  renderVals() {
+    const s = this.state;
+    const evs = [
+      { id: 'nd', name: 'USC vs Notre Dame', meta: 'Sat 11/7 · Sec 112, Row 24 · 2 tickets', qty: 2, opts: [72, 80, 90] },
+      { id: 'formal', name: 'Sig Ep Fall Formal', meta: 'Fri 11/13 · General admission · 1 ticket', qty: 1, opts: [22, 28, 35] }
+    ];
+    const cur = evs.find((e) => e.id === s.ev);
+    const price = cur.opts.indexOf(s.price) >= 0 ? s.price : cur.opts[1];
+    const owned = evs.map((e) => ({
+      name: e.name, meta: e.meta,
+      pressed: e.id === s.ev ? 'true' : 'false',
+      style: 'display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; cursor: pointer; font-family: Instrument Sans, sans-serif; color: #111113; ' + (e.id === s.ev ? 'border: 1.5px solid #0A7D50; background: #E3F3EB;' : 'border: 1.5px solid #E4E4E0; background: #FFFFFF;'),
+      dot: 'width: 22px; height: 22px; border-radius: 999px; box-sizing: border-box; flex-shrink: 0; ' + (e.id === s.ev ? 'border: 7px solid #0A7D50; background: #FFFFFF;' : 'border: 2px solid #C9C9C4;'),
+      pick: () => this.setState({ ev: e.id, price: e.opts[1] })
+    }));
+    const labels = [['Quick sale', 'Hours'], ['Suggested', 'About a day'], ['Top price', 'A few days']];
+    const prices = cur.opts.map((p, i) => ({
+      price: p, label: labels[i][0], speed: labels[i][1],
+      pressed: p === price ? 'true' : 'false',
+      style: 'padding: 12px 6px; border-radius: 14px; cursor: pointer; text-align: center; font-family: Instrument Sans, sans-serif; ' + (p === price ? 'border: 0; background: #111113; color: #FFFFFF;' : 'border: 1.5px solid #E4E4E0; background: #FFFFFF; color: #111113;'),
+      pick: () => this.setState({ price: p })
+    }));
+    return {
+      owned: owned, prices: prices, price: price,
+      payout: (price * cur.qty * 0.95).toFixed(2),
+      qtyLabel: cur.qty === 1 ? '1 ticket' : cur.qty + ' tickets'
+    };
+  }
+}
+</script>
+</body>
+</html>

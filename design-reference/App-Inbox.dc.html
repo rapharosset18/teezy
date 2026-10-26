@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy inbox</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div style="flex-grow: 1; overflow: hidden; padding: 56px 0 0; display: flex; flex-direction: column; gap: 14px;">
+    <div style="padding: 0 16px; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center;">
+      <a href="App-Friends.dc.html" aria-label="Add friends" style="width: 44px; height: 44px; display: grid; place-items: center;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 19c.9-3.2 3.2-5 6-5s5.1 1.8 6 5M18 8v6M15 11h6"/></svg>
+      </a>
+      <h1 style="margin: 0; text-align: center; font-size: 18px; font-weight: 700;">Inbox</h1>
+      <a href="App-Chat.dc.html" aria-label="New message" style="width: 44px; height: 44px; display: grid; place-items: center;">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h6"/><path d="M17 3l4 4-9 9H8v-4z"/></svg>
+      </a>
+    </div>
+
+    <nav aria-label="Notifications" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0 12px;">
+      <a href="App-Friends.dc.html" aria-label="New friends, 3 new" style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+        <span style="position: relative; width: 52px; height: 52px; border-radius: 999px; background: #2B3A80; color: #FFFFFF; display: grid; place-items: center;">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 19c.9-3.2 3.2-5 6-5s5.1 1.8 6 5M18 8v6M15 11h6"/></svg>
+          <span style="position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: #0A7D50; color: #FFFFFF; font-size: 11px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #FFFFFF;">3</span>
+        </span>
+        <span style="font-size: 13px; font-weight: 600;">Friends</span>
+      </a>
+      <a href="App-Saved.dc.html" aria-label="Offers and deals, 1 new" style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+        <span style="position: relative; width: 52px; height: 52px; border-radius: 999px; background: #0A7D50; color: #FFFFFF; display: grid; place-items: center;">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h12l-3-3M20 15H8l3 3"/></svg>
+          <span style="position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: #111113; color: #FFFFFF; font-size: 11px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #FFFFFF;">1</span>
+        </span>
+        <span style="font-size: 13px; font-weight: 600;">Offers</span>
+      </a>
+      <a href="App-Dashboard.dc.html" aria-label="Ticket updates, 1 new" style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+        <span style="position: relative; width: 52px; height: 52px; border-radius: 999px; background: #111113; color: #FFFFFF; display: grid; place-items: center;">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4z"/></svg>
+          <span style="position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: #0A7D50; color: #FFFFFF; font-size: 11px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #FFFFFF;">1</span>
+        </span>
+        <span style="font-size: 13px; font-weight: 600;">Tickets</span>
+      </a>
+      <a href="App-Saved.dc.html" aria-label="From Teezy" style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+        <span style="width: 52px; height: 52px; border-radius: 999px; background: #F3F3F1; color: #111113; display: grid; place-items: center;">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+        </span>
+        <span style="font-size: 13px; font-weight: 600;">Teezy</span>
+      </a>
+    </nav>
+
+    <div style="height: 8px; background: #F3F3F1; flex-shrink: 0;"></div>
+
+    <div style="display: flex; flex-direction: column; padding: 0 16px;">
+      <h2 style="margin: 0 0 4px; font-size: 15px; font-weight: 700; color: #63636B;">Messages</h2>
+      <sc-for list="{{threads}}" as="t" hint-placeholder-count="7">
+        <a href="App-Chat.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 9px 0;">
+          <span style="{{t.avatar}}">{{t.initial}}</span>
+          <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+            <span style="font-size: 16px; font-weight: 600;">{{t.name}}</span>
+            <span style="{{t.lastStyle}}">{{t.last}}</span>
+          </span>
+          <span style="font-size: 12px; color: #63636B; align-self: flex-start; margin-top: 4px;">{{t.when}}</span>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; padding: 8px 8px 30px; border-top: 1px solid #E4E4E0; background: #FFFFFF;">
+    <a href="App-Tickets.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3a2 2 0 0 0 0 4v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a2 2 0 0 0 0-4z"/></svg>My Tickets</a>
+    <a href="App-Dashboard.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+    <a href="App-Home.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 500; color: #63636B;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="App-Inbox.dc.html" aria-current="page" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 700; color: #111113; background: #F3F3F1;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5L6 5.5h12l2.5 8V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></svg>Inbox</a>
+    <a href="App-Sell.dc.html" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 5px; border-radius: 14px; font-size: 11px; font-weight: 600; color: #0A7D50;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Sell</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const av = (bg, fg) => 'width: 48px; height: 48px; border-radius: 999px; display: grid; place-items: center; font-size: 19px; font-weight: 700; flex-shrink: 0; background: ' + bg + '; color: ' + fg + ';';
+    const bold = 'font-size: 14px; color: #111113; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+    const dim = 'font-size: 14px; color: #63636B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+    return {
+      threads: [
+        { initial: 'M', name: 'Maya R.', last: 'Meet me at 74 and they are yours', when: '2m', avatar: av('#E3F3EB', '#0A6542'), lastStyle: bold },
+        { initial: 'T', name: 'Theo', last: 'You coming to DG Saturday?', when: '1h', avatar: av('#E6E9F5', '#2B3A80'), lastStyle: bold },
+        { initial: 'J', name: 'Jordan K.', last: 'Can you do $35?', when: '3h', avatar: av('#F3F3F1', '#111113'), lastStyle: dim },
+        { initial: 'A', name: 'Ana', last: 'Saving you a formal ticket for $25', when: '5h', avatar: av('#F5E6E9', '#7A2738'), lastStyle: dim },
+        { initial: 'S', name: 'Sig Ep', last: 'Spring dues are open, due Nov 15', when: 'Mon', avatar: av('#6B2D3A', '#FFFFFF'), lastStyle: dim },
+        { initial: 'C', name: 'Chris P.', last: 'Sent the transfer', when: 'Tue', avatar: av('#F3F3F1', '#111113'), lastStyle: dim },
+        { initial: 'N', name: 'Nico', last: 'Photos from Arizona are up', when: 'Oct 18', avatar: av('#EFE8DF', '#4A3B2A'), lastStyle: dim }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Teezy watchlist and offers</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; background: #FFFFFF; color: #111113; font-family: Instrument Sans, system-ui, sans-serif; display: flex; flex-direction: column;">
+  <div style="padding: 56px 16px 0; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; overflow: hidden;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <a href="App-Drawer.dc.html" aria-label="Back" style="width: 40px; height: 44px; display: grid; place-items: center; margin-left: -8px;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.03em;">Saved</h1>
+    </div>
+    <div role="group" aria-label="Saved type" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 3px; border-radius: 12px; background: #F3F3F1;">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+        <button onClick="{{t.pick}}" aria-pressed="{{t.pressed}}" style="{{t.style}}">{{t.label}}</button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{isOffers}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="padding: 14px; border-radius: 18px; border: 1.5px solid #0A7D50; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; gap: 12px;">
+            <div style="min-width: 0;"><p style="margin: 0; font-size: 16px; font-weight: 600;">Maya countered at $74</p><p style="margin: 2px 0 0; font-size: 13px; color: #63636B;">USC vs Notre Dame · Sec 112 · 2 tickets</p></div>
+            <span style="font-size: 12px; color: #63636B; white-space: nowrap;">23h left</span>
+          </div>
+          <p style="margin: 0; font-size: 13px; color: #3F4045; font-variant-numeric: tabular-nums;">You $62 → Maya $80 → You $72 → <b style="color: #111113;">Maya $74</b></p>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+            <a href="App-Chat.dc.html" style="height: 44px; border-radius: 12px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">Chat</a>
+            <a href="App-Chat.dc.html" style="height: 44px; border-radius: 12px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">Counter</a>
+            <a href="App-Tickets.dc.html" style="height: 44px; border-radius: 12px; background: #0A7D50; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600;">Accept</a>
+          </div>
+        </div>
+        <sc-for list="{{offers}}" as="o" hint-placeholder-count="2">
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #E4E4E0;">
+            <span style="min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 16px; font-weight: 600;">{{o.title}}</span>
+              <span style="font-size: 13px; color: #63636B;">{{o.meta}}</span>
+            </span>
+            <a href="App-Chat.dc.html" style="height: 38px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E4E4E0; display: flex; align-items: center; font-size: 14px; font-weight: 600;">{{o.action}}</a>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isWatch}}" hint-placeholder-val="{{ false }}">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+        <sc-for list="{{watch}}" as="w" hint-placeholder-count="4">
+          <a href="App-Search.dc.html" style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="{{w.tile}}">
+              <span style="font-size: 20px; font-weight: 700; line-height: 1.05; white-space: pre-line;">{{w.short}}</span>
+              <sc-if value="{{w.drop}}" hint-placeholder-val="{{ false }}">
+                <span style="position: absolute; top: 10px; left: 10px; height: 24px; padding: 0 8px; border-radius: 999px; background: #FFFFFF; color: #0A6542; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center;">Price dropped</span>
+              </sc-if>
+            </span>
+            <span style="display: flex; flex-direction: column; gap: 1px;">
+              <span style="font-size: 15px; font-weight: 600;">{{w.name}}</span>
+              <span style="font-size: 13px; color: #63636B;">{{w.meta}}</span>
+            </span>
+          </a>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'Offers' }; }
+  renderVals() {
+    const tab = this.state.tab;
+    const tabs = [['Offers', 'My offers · 3'], ['Watch', 'Watchlist · 5']].map((p) => ({
+      label: p[1],
+      pressed: p[0] === tab ? 'true' : 'false',
+      style: 'height: 38px; border: 0; border-radius: 10px; cursor: pointer; font: ' + (p[0] === tab ? '700' : '500') + ' 14px/1 Instrument Sans, sans-serif; ' + (p[0] === tab ? 'background: #FFFFFF; color: #111113; box-shadow: 0 1px 3px rgba(17,17,19,0.15);' : 'background: transparent; color: #63636B;'),
+      pick: () => this.setState({ tab: p[0] })
+    }));
+    const tile = (bg) => 'position: relative; height: 120px; border-radius: 14px; padding: 12px; box-sizing: border-box; display: flex; align-items: flex-end; color: #FFFFFF; background: ' + bg + ';';
+    return {
+      tabs: tabs,
+      isOffers: tab === 'Offers',
+      isWatch: tab === 'Watch',
+      offers: [
+        { title: '$35 to Jordan K.', meta: 'USC vs UCLA · 1 ticket · seen 1h ago', action: 'Raise' },
+        { title: '$20 to 4 sellers', meta: 'Sig Ep Fall Formal · waiting', action: 'Edit' }
+      ],
+      watch: [
+        { short: 'USC\nvs UCLA', name: 'USC vs UCLA', meta: 'Thu 11/12 · now $40+', drop: true, tile: tile('#1F2A44') },
+        { short: 'Fall\nFormal', name: 'Sig Ep Fall Formal', meta: 'Fri 11/13 · $25+', drop: false, tile: tile('#6B2D3A') },
+        { short: 'USC\nvs ORE', name: 'USC vs Oregon', meta: 'Sat 11/21 · $55+', drop: false, tile: tile('#2F4A3C') },
+        { short: 'Senior\nNight', name: 'Volleyball senior night', meta: 'Sun 11/22 · $8+', drop: true, tile: tile('#4A3B2A') }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
