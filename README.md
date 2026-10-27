@@ -4,7 +4,7 @@ Peer-to-peer ticket marketplace demo (starting with USC events, open to anyone w
 
 - `web/`: the demo app (one HTML file plus `engine.js` slider helpers), served by the API.
 - `server/`: Fastify API, migrations, the matching engine, background jobs (pg-boss).
-- `design-reference/`: the redesign mocks (not applied yet).
+- `design-reference/`: the redesign mocks (not applied yet), with a clickable gallery for feedback at https://rapharosset18.github.io/teezy/ (add `?notes` to see the team's design notes).
 
 ## Run it
 

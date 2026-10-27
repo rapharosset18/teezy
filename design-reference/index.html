@@ -30,21 +30,34 @@
   .card { background: #fff; border: 1.5px dashed #B9B9B3; border-radius: 16px; padding: 14px 16px; }
   .card b { display: block; margin-bottom: 4px; }
   .card span { color: var(--muted); font-size: 14px; }
-  .live { background: var(--tint); border-radius: 16px; padding: 14px 16px; max-width: 720px; }
-  .live a { color: var(--green); font-weight: 700; }
+  .ask { background: var(--tint); border-radius: 16px; padding: 14px 16px; max-width: 720px; margin-top: 16px; color: #0A4D33; }
+  .ask ul { margin: 6px 0 8px; padding-left: 20px; }
+  /* Design notes for the team: hidden for visitors, shown with ?notes */
+  figure .note, .flag { display: none; }
+  body.notes figure .note, body.notes .flag { display: block; }
   @media (max-width: 440px) { .phone, .phone iframe, figure { width: 100%; } }
 </style>
 </head>
 <body>
+<script>if (/[?&]notes\b/.test(location.search)) document.body.classList.add('notes');</script>
 <header>
   <h1>Teezy redesign</h1>
-  <p>Every screen from the design files, rendered and clickable (chips, tabs and toggles work). Each phone scrolls on its own. Flags mark places where the design no longer matches decisions made since it was drawn.</p>
+  <p>Teezy is a ticket marketplace for students: buy and sell tickets to games, parties and concerts, negotiate a price in chat, and the money is held until you get in. These are the screens for the new design. Tap around: chips, tabs and toggles work, and each phone scrolls on its own. It’s a design preview, so nothing is real and buttons that would leave the screen don’t go anywhere.</p>
+  <div class="ask">
+    <b>What would help most</b>
+    <ul>
+      <li>What’s confusing, or where you’d expect something else to happen.</li>
+      <li>Could you find your tickets, see where your money is, and sell a ticket?</li>
+      <li>What feels missing, cluttered or unnecessary?</li>
+      <li>Would you use this over what you use today? Why or why not?</li>
+    </ul>
+    Reply to whoever sent you this link. Screenshots with a note are perfect.
+  </div>
   <nav>
     <a href="#tabs">Main tabs</a>
     <a href="#panels">Panel and sheet</a>
     <a href="#pushed">Other screens</a>
     <a href="#missing">Not designed yet</a>
-    <a href="#current">Current app</a>
   </nav>
 </header>
 
@@ -103,7 +116,7 @@
 
 <section id="missing">
   <h2>Not designed yet</h2>
-  <p class="note">The backend supports these, but no mock exists, so today they use the old look.</p>
+  <p class="note">These parts of Teezy work behind the scenes but don’t have a design yet. Ideas welcome.</p>
   <div class="missing">
     <div class="card"><b>Event / section page</b><span>The price slider: count of tickets available, good-deal markers and badge, "Buy at $X", "Seats don't need to be together". The core of the order book.</span></div>
     <div class="card"><b>No match</b><span>"No seller at $X or less right now", with "Alert me at $X" and "Send an offer".</span></div>
@@ -116,10 +129,6 @@
   </div>
 </section>
 
-<section id="current">
-  <h2>Current app</h2>
-  <div class="live">The running app still uses the old design. With <code>npm run dev</code> running, open it at <a href="http://localhost:3000" target="_blank">localhost:3000</a> to compare.</div>
-</section>
 <div style="height:48px"></div>
 </body>
 </html>
