@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Teezy Swoosh</title>
+<title>Teezy Main</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -554,9 +554,9 @@ V.home = function(){
       (out ? '<button class="card lime tap row" data-act="saved" data-tab="Offers"><span class="avatar sm" style="background:var(--ink);color:var(--accent)">' + I.swap + '</span><span class="grow"><span class="lt">' + plural(out, 'offer') + ' out' + (counter.length ? ' · ' + counter.length + ' counter' : '') + '</span><span class="ls">' + (counter.length ? esc(counter[0].to.split(' ')[0]) + ' countered at $' + counter[0].history[counter[0].history.length - 1][1] + ' for ' + esc(EV[counter[0].ev].name) : 'Waiting on sellers') + '</span></span>' + I.chev + '</button>' : '') +
       (watch.length ? '<div class="stack"><div class="between"><h2 class="h2">Your watchlist</h2><button class="link" data-act="saved" data-tab="Watch">See all</button></div><div class="hscroll">' +
         watch.map(function(id){ return '<button class="wcard" data-act="event" data-ev="' + id + '">' + tile(id, 110, '<span class="heart">' + I.heartOn + '</span>' + (S.drops[id] ? '<span class="flag">Price dropped</span>' : '')) + '<span><span class="lt" style="font-size:.86rem">' + esc(EV[id].name) + '</span><span class="ls">' + EV[id].date.split(', ')[1] + ' · from $' + fromPrice(id) + '</span></span></button>'; }).join('') + '</div></div>' : '') +
+      gamesCarousel() +
       '<div class="stack" style="gap:0"><h2 class="h2">' + esc(whereLabel()) + ' · ' + esc(S.where.when === 'Pick dates' ? whenLabel() : whenLabel().toLowerCase()) + '</h2>' +
         (near.length ? '<div class="list">' + near.map(eventRow).join('') + '</div>' : '<p class="empty">Nothing in that window. Try a wider radius or other dates.</p>') + '</div>' +
-      gamesCarousel() +
       (rest.length ? '<div class="stack" style="gap:0"><h2 class="h2">More events</h2><div class="list">' + rest.map(eventRow).join('') + '</div></div>' : '') +
     '</div>';
 };
