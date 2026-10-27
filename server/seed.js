@@ -1,4 +1,4 @@
-// Demo data matching the web demo's listings (web/index.html), so the feed cards and the
+// Demo data matching the web demo's listings (web/classic.html), so the feed cards and the
 // order book agree. Prices are per ticket.
 import { withTransaction } from './db.js';
 

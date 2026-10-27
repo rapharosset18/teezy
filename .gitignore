@@ -1,6 +1,7 @@
 node_modules/
 .tools/
 .pgdata/
+.pgdata-design/
 .pgdata-test/
 .DS_Store
 *.log
@@ -8,3 +9,5 @@ node_modules/
 .env.*
 # Machine-specific editor/app settings (absolute paths)
 .claude/
+artifact/dist/
+teezy-swoosh-lovable.zip

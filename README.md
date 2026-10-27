@@ -2,9 +2,11 @@
 
 Peer-to-peer ticket marketplace demo (starting with USC events, open to anyone with a verified email), with a Node + Postgres order book.
 
-- `web/`: the demo app (one HTML file plus `engine.js` slider helpers), served by the API.
+- `web/index.html`: the Teezy app in the Swoosh design, the same as the Teezy Swoosh artifact. It runs entirely in the browser with demo data (it doesn't call the API yet) and is live at https://rapharosset18.github.io/teezy/. It's generated from `prototype/index.html`: edit the prototype, then run `npm run sync:web`.
+- `web/classic.html`: the earlier UI that talks to the API (email sign-in, order book, price alerts), at http://localhost:3000/classic.html.
+- `prototype/`: the source of the app (also what's published as the artifact and zipped for Lovable).
 - `server/`: Fastify API, migrations, the matching engine, background jobs (pg-boss).
-- `design-reference/`: the redesign mocks (not applied yet), with a clickable gallery for feedback at https://rapharosset18.github.io/teezy/ (add `?notes` to see the team's design notes).
+- `design-reference/`: the redesign mocks, with a clickable gallery at https://rapharosset18.github.io/teezy/design-reference/ (add `?notes` to see the team's design notes).
 
 ## Run it
 
@@ -20,7 +22,7 @@ Start Postgres (embedded, data in `.pgdata`), migrate, seed the demo data, and r
 npm run dev
 ```
 
-Open http://localhost:3000. To put the demo data back to its starting state:
+Open http://localhost:3000 for the app, or http://localhost:3000/classic.html for the API-connected UI. For a second server with its own data (for design work), run `npm run design` and open http://localhost:3100. To put the demo data back to its starting state:
 
 ```bash
 npm run dev -- --reset

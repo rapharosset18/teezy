@@ -6,6 +6,8 @@
   "engines": { "node": ">=22.12.0" },
   "scripts": {
     "dev": "node server/scripts/dev.js",
+    "design": "node server/scripts/design.js",
+    "sync:web": "node prototype/sync-web.js",
     "migrate": "node server/scripts/migrate.js",
     "test": "node server/test/run.js"
   },
