@@ -5,6 +5,7 @@ import { enqueue, QUEUES } from '../jobs.js';
 import { badRequest, notFound, forbidden, conflict, requireInt } from '../errors.js';
 import { CANDIDATE_COLUMNS, rankListings, rankOrderBySql, toCandidate } from '../engine/ranking.js';
 import { planFills, orderTotals } from '../engine/rules.js';
+import { closeCheckoutForExpiry } from './payments.js';
 
 const LOCK_TIMEOUT = '55P03';
 
@@ -15,6 +16,7 @@ const ELIGIBLE = `
   JOIN users u ON u.id = l.seller_id
   WHERE l.event_id = $1
     AND l.status = 'active'
+    AND EXISTS (SELECT 1 FROM events e WHERE e.id = l.event_id AND e.starts_at > now())
     AND ($2::text IS NULL OR l.tier = $2)
     AND l.seller_id <> $3            -- never match a buyer against their own listing
     AND l.price_cents <= $4
@@ -29,6 +31,7 @@ function parseOrderInput(input) {
     tier: input.tier && input.tier !== 'any' ? input.tier : null,
     qty: requireInt(input.qty ?? 1, 'qty', { min: 1, max: 10 }),
     maxPriceCents: requireInt(input.maxPriceCents, 'maxPriceCents', { min: 1 }),
+    listingId: input.listingId || null,
     allowSplit: !!input.allowSplit,
   };
 }
@@ -38,17 +41,24 @@ function parseOrderInput(input) {
 // are mid-match, we drop our own locks, wait for theirs, and look again until the deadline.
 export async function buyAtPrice(input) {
   const order = parseOrderInput(input);
+  const { rows: [buyer] } = await query('SELECT payment_blocked_at FROM users WHERE id = $1', [order.buyerId]);
+  if (buyer?.payment_blocked_at) throw forbidden('this account can no longer buy tickets; contact support');
   const minQty = order.allowSplit ? 1 : order.qty;
   const limit = order.allowSplit ? order.qty : 1; // each listing gives at least 1 ticket
   const params = [order.eventId, order.tier, order.buyerId, order.maxPriceCents, minQty];
+  // Direct seat purchases must reserve the seat the buyer actually selected.
+  if (order.listingId && !/^[0-9a-f-]{36}$/i.test(order.listingId)) throw badRequest('invalid listing id');
+  const eligible = ELIGIBLE + (order.listingId ? ' AND l.id = $6::uuid' : '');
+  if (order.listingId) params.push(order.listingId);
+  const limitParameter = params.length + 1;
   const deadline = Date.now() + config.matchDeadlineMs;
 
   return withTransaction(async (client) => {
     for (;;) {
       await client.query('SAVEPOINT attempt');
       const { rows } = await client.query(
-        `SELECT ${CANDIDATE_COLUMNS} ${ELIGIBLE}
-         ORDER BY ${rankOrderBySql()} LIMIT $6
+        `SELECT ${CANDIDATE_COLUMNS} ${eligible}
+         ORDER BY ${rankOrderBySql()} LIMIT $${limitParameter}
          FOR UPDATE OF l SKIP LOCKED`,
         [...params, limit],
       );
@@ -58,7 +68,7 @@ export async function buyAtPrice(input) {
       // Release whatever we locked before waiting on anyone else, so waits can't deadlock.
       await client.query('ROLLBACK TO SAVEPOINT attempt');
       const { rows: all } = await client.query(
-        `SELECT l.id, l.qty_available ${ELIGIBLE} ORDER BY ${rankOrderBySql()}`,
+        `SELECT l.id, l.qty_available ${eligible} ORDER BY ${rankOrderBySql()}`,
         params,
       );
       const supply = order.allowSplit ? all.reduce((s, r) => s + r.qty_available, 0) : all.length ? order.qty : 0;
@@ -114,7 +124,8 @@ export async function loadOrder(db, orderId) {
   const { rows: [o] } = await db.query('SELECT * FROM orders WHERE id = $1', [orderId]);
   if (!o) return null;
   const { rows: fills } = await db.query(
-    `SELECT f.*, l.tier, l.section, l.seat_label, u.display_name AS seller_name, u.rating AS seller_rating
+    `SELECT f.*, l.tier, l.section, l.seat_label, u.display_name AS seller_name, u.rating AS seller_rating,
+       EXISTS (SELECT 1 FROM delivery_proofs d WHERE d.fill_id = f.id) AS has_proof
      FROM order_fills f JOIN listings l ON l.id = f.listing_id JOIN users u ON u.id = f.seller_id
      WHERE f.order_id = $1 ORDER BY f.created_at, f.id`,
     [orderId],
@@ -145,6 +156,13 @@ export async function loadOrder(db, orderId) {
       qty: f.qty,
       priceCents: f.price_cents,
       escrowStatus: f.escrow_status,
+      transferReference: f.transfer_reference,
+      transferredAt: f.transferred_at,
+      confirmedAt: f.confirmed_at,
+      autoConfirmed: f.auto_confirmed,
+      problemReportedAt: f.problem_reported_at,
+      problemReason: f.problem_reason,
+      hasProof: f.has_proof,
     })),
   };
 }
@@ -153,7 +171,93 @@ export async function getOrder(orderId, userId) {
   const order = await loadOrder({ query }, orderId);
   if (!order) throw notFound('order');
   if (order.buyerId !== userId && !order.fills.some((f) => f.sellerId === userId)) throw forbidden('not your order');
+  if (order.buyerId !== userId) return {
+    id: order.id, eventId: order.eventId, status: order.status, paidAt: order.paidAt,
+    fills: order.fills.filter((f) => f.sellerId === userId),
+  };
   return order;
+}
+
+// Recording a seller's declaration is not proof from the ticketing provider.
+// Each seller can only advance their own fill, including on split orders.
+export async function recordTransfer(orderId, fillId, sellerId, reference) {
+  if (typeof reference !== 'string' || !reference.trim() || reference.trim().length > 200) {
+    throw badRequest('enter a transfer reference (1–200 characters)');
+  }
+  return withTransaction(async (client) => {
+    const { rows: [o] } = await client.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [orderId]);
+    if (!o) throw notFound('order');
+    const { rows: [fill] } = await client.query('SELECT * FROM order_fills WHERE id = $1 AND order_id = $2', [fillId, orderId]);
+    if (!fill) throw notFound('ticket');
+    if (fill.seller_id !== sellerId) throw forbidden('only the seller can record this transfer');
+    if (o.status !== 'paid') throw conflict('not_paid', 'the buyer must pay first');
+    if (fill.escrow_status !== 'held') throw conflict('wrong_step', 'this ticket is not waiting for transfer');
+    await client.query(`UPDATE order_fills SET escrow_status = 'transferred', transfer_reference = $2,
+      transferred_at = clock_timestamp(), updated_at = clock_timestamp() WHERE id = $1`, [fillId, reference.trim()]);
+    await notify(client, { type: 'order', orderId, userId: o.buyer_id });
+    return { id: fillId, status: 'transferred' };
+  });
+}
+
+export async function confirmTransfer(orderId, fillId, buyerId) {
+  return withTransaction(async (client) => {
+    const { rows: [o] } = await client.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [orderId]);
+    if (!o) throw notFound('order');
+    if (o.buyer_id !== buyerId) throw forbidden('only the buyer can confirm receipt');
+    if (o.status !== 'paid') throw conflict('not_paid', 'the order has not been paid');
+    const { rowCount } = await client.query(`UPDATE order_fills SET escrow_status = 'confirmed',
+      confirmed_at = clock_timestamp(), updated_at = clock_timestamp()
+      WHERE id = $1 AND order_id = $2 AND escrow_status = 'transferred'
+      RETURNING seller_id`, [fillId, orderId]);
+    if (!rowCount) throw conflict('wrong_step', 'this ticket is not waiting for confirmation');
+    await notify(client, { type: 'order', orderId, userId: buyerId });
+    return { id: fillId, status: 'confirmed' };
+  });
+}
+
+const PROOF_MAX_BYTES = 4 * 1024 * 1024; // Stripe limits the total evidence on a dispute
+const PROOF_SIGNATURES = {
+  'image/png': [0x89, 0x50, 0x4e, 0x47], 'image/jpeg': [0xff, 0xd8, 0xff], 'application/pdf': [0x25, 0x50, 0x44, 0x46],
+};
+
+// The seller's transfer confirmation. Without it they aren't covered if the buyer disputes.
+export async function saveDeliveryProof(orderId, fillId, sellerId, input = {}) {
+  const signature = PROOF_SIGNATURES[input.contentType];
+  const file = typeof input.data === 'string' ? Buffer.from(input.data, 'base64') : null;
+  if (!signature || !file?.length || !signature.every((byte, i) => file[i] === byte)) throw badRequest('upload a PNG, JPEG or PDF');
+  if (file.length > PROOF_MAX_BYTES) throw badRequest('the file must be 4 MB or smaller');
+  const filename = String(input.filename || 'transfer-confirmation').slice(0, 200);
+  return withTransaction(async (client) => {
+    const { rows: [o] } = await client.query('SELECT id FROM orders WHERE id = $1 FOR UPDATE', [orderId]);
+    if (!o) throw notFound('order');
+    const { rows: [fill] } = await client.query('SELECT * FROM order_fills WHERE id = $1 AND order_id = $2', [fillId, orderId]);
+    if (!fill) throw notFound('ticket');
+    if (fill.seller_id !== sellerId) throw forbidden('only the seller can add proof');
+    if (!['transferred', 'confirmed', 'released'].includes(fill.escrow_status)) throw conflict('wrong_step', 'record the transfer first');
+    await client.query(`INSERT INTO delivery_proofs (fill_id, filename, content_type, data) VALUES ($1,$2,$3,$4)
+      ON CONFLICT (fill_id) DO UPDATE SET filename=EXCLUDED.filename, content_type=EXCLUDED.content_type, data=EXCLUDED.data, created_at=now()`,
+      [fillId, filename, input.contentType, file]);
+    return { id: fillId, hasProof: true };
+  });
+}
+
+// A report keeps the fill out of auto-confirmation, so the seller isn't paid until it's reviewed.
+export async function reportProblem(orderId, fillId, buyerId, reason) {
+  if (typeof reason !== 'string' || !reason.trim() || reason.trim().length > 500) {
+    throw badRequest('describe the problem (1–500 characters)');
+  }
+  return withTransaction(async (client) => {
+    const { rows: [o] } = await client.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [orderId]);
+    if (!o) throw notFound('order');
+    if (o.buyer_id !== buyerId) throw forbidden('only the buyer can report a problem');
+    const { rows: [fill] } = await client.query(`UPDATE order_fills SET problem_reported_at = clock_timestamp(), problem_reason = $3,
+      updated_at = clock_timestamp() WHERE id = $1 AND order_id = $2 AND escrow_status = 'transferred'
+      AND problem_reported_at IS NULL RETURNING seller_id`, [fillId, orderId, reason.trim()]);
+    if (!fill) throw conflict('wrong_step', 'this ticket can no longer be reported');
+    await notify(client, { type: 'order', orderId, userId: buyerId });
+    await notify(client, { type: 'order', orderId, userId: fill.seller_id });
+    return { id: fillId, status: 'transferred', problemReported: true };
+  });
 }
 
 // Escrow steps, mirroring the app's escrow screen. Each moves every fill of the order
@@ -196,7 +300,10 @@ export async function advanceEscrow(orderId, userId, step) {
 
 // Job: a buyer who doesn't pay in time gives the seats back. Restoring quantity doesn't
 // touch the price, so each listing keeps its place in line.
-export async function expireOrder(orderId) {
+export async function expireOrder(orderId, stripe) {
+  const { rows: [payment] } = await query(`SELECT p.order_id FROM payments p JOIN orders o ON o.id=p.order_id
+    WHERE p.order_id=$1 AND o.status='pending_payment' AND o.payment_expires_at<=now()`, [orderId]);
+  if (payment) await closeCheckoutForExpiry(orderId, stripe);
   return withTransaction(async (client) => {
     const { rows: [o] } = await client.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [orderId]);
     if (!o || o.status !== 'pending_payment' || new Date(o.payment_expires_at) > new Date()) return false;
@@ -209,6 +316,7 @@ export async function expireOrder(orderId) {
       await client.query('UPDATE listings SET qty_available = qty_available + $2 WHERE id = $1', [f.listing_id, f.qty]);
     }
     await client.query(`UPDATE orders SET status = 'expired', updated_at = clock_timestamp() WHERE id = $1`, [orderId]);
+    await client.query("UPDATE payments SET status='expired',updated_at=now() WHERE order_id=$1 AND status='pending'", [orderId]);
     await notify(client, { type: 'book', eventId: o.event_id });
     return true;
   });

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teezy · Transfer practice</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f2ec;color:#0e0e10;font:16px system-ui,sans-serif;padding:28px 16px}main{max-width:760px;margin:auto}h1{font-size:2.2rem;letter-spacing:-.04em;margin:14px 0}h2{font-size:1.1rem;margin:0 0 10px}p{line-height:1.55}section{background:white;border:1.5px solid #e3e3dc;border-radius:16px;padding:20px;margin:16px 0}.tag{background:#d6ff3f;padding:6px 12px;border-radius:20px;font-weight:800;font-size:.8rem}button,a.button{font:inherit;font-weight:700;color:#0e0e10;border:1.5px solid #0e0e10;border-radius:30px;padding:12px 16px;background:#d6ff3f;text-decoration:none;cursor:pointer;display:inline-block}button:disabled{opacity:.4;cursor:default}.steps{display:grid;gap:10px}.steps button{text-align:left;background:white}.steps button.current{background:#d6ff3f}.row{display:flex;gap:10px;flex-wrap:wrap}label{display:block;font-weight:700}input{width:100%;font:inherit;padding:12px;border:1px solid #aaa;border-radius:10px;margin:8px 0}#status{white-space:pre-wrap;overflow-wrap:anywhere;background:#f2f2ec;padding:16px;border-radius:12px;line-height:1.6}#message{min-height:30px;color:#075631}a{color:inherit}small{color:#54555b}button:focus-visible,a:focus-visible{outline:3px solid #08703f;outline-offset:3px}
+</style>
+<main>
+<span class="tag">LOCAL TEST · NO REAL MONEY OR TICKETS</span>
+<h1>Practice a ticket transfer.</h1>
+<p>Create a fresh practice listing, then play both sides of a purchase. Every step uses the real API and saves to your local database. Reload this page at any time to check that progress stays saved.</p>
+<p><small>Switching roles also changes the signed-in account in other Teezy tabs in this browser. You can sign back into your normal account afterward.</small></p>
+<section><h2>1. Create a practice ticket</h2><p>Creates two test accounts and a new $10 listing without resetting any existing data.</p><button id="new">New practice ticket</button></section>
+<section><h2>2. Follow the purchase and delivery</h2>
+<label for="reference">Practice transfer reference</label><input id="reference" maxlength="200" value="PRACTICE-TRANSFER-001">
+<p><small>For a real transaction, send the ticket in the official ticketing app and use its reference. This test only simulates that handoff.</small></p>
+<div class="steps">
+<button id="reserve">Reserve 1 ticket as buyer</button>
+<button id="pay">Complete test payment as buyer</button>
+<button id="send">Mark ticket sent as seller</button>
+<button id="confirm">Confirm receipt as buyer</button>
+</div></section>
+<section><h2>3. Inspect saved progress</h2><div id="status" aria-live="polite">Loading…</div><p id="message" role="status"></p><div class="row"><button id="refresh">Refresh saved status</button><button id="buyer">Switch to buyer</button><button id="seller">Switch to seller</button><a class="button" href="/">Open Teezy</a></div><p><small>In Teezy, use My Tickets as the buyer, or My Tickets → Selling as the seller. Delivery confirmation does not trigger a payout; live payments and payouts are a separate step.</small></p></section>
+<a href="/">← Back to Teezy</a>
+</main>
+<script>
+(function(){
+  'use strict';
+  var fixture = {}, current = null, me = null, working = false;
+  try { fixture = JSON.parse(sessionStorage.getItem('teezy-transfer-practice') || '{}'); } catch (_) {}
+  async function api(method, url, data) {
+    var res = await fetch(url, { method:method, credentials:'same-origin', headers:{'content-type':'application/json'}, body:data === undefined ? undefined : JSON.stringify(data) });
+    var result = await res.json(); if (!res.ok) throw new Error(result.message || 'Request failed'); return result;
+  }
+  function save(){ sessionStorage.setItem('teezy-transfer-practice', JSON.stringify(fixture)); }
+  async function role(name){ await api('POST', '/api/dev/test-session', { role:name }); me = await api('GET', '/api/me'); }
+  function display(){
+    var f = current && current.fills[0], state = f && f.escrowStatus;
+    var labels = { awaiting_payment:'Reserved · awaiting test payment', held:'Test payment saved · waiting for seller', transferred:'Seller marked sent · waiting for buyer confirmation', confirmed:'Buyer receipt confirmed · practice complete' };
+    document.getElementById('status').textContent = 'Current account: ' + (me && me.signedIn ? me.displayName : 'Not signed in') + '\n' +
+      (fixture.listingId ? 'Practice listing: ' + fixture.listingId : 'Create a practice ticket to begin.') +
+      (fixture.orderId ? '\nOrder: ' + fixture.orderId : '') + (f ? '\nProgress: ' + (labels[state] || state) : '') +
+      (f && f.transferReference ? '\nTransfer reference: ' + f.transferReference : '') +
+      (f && f.transferredAt ? '\nMarked sent: ' + new Date(f.transferredAt).toLocaleString() : '') +
+      (f && f.confirmedAt ? '\nReceipt confirmed: ' + new Date(f.confirmedAt).toLocaleString() : '');
+    var enabled = { new:true, reserve:fixture.listingId && !fixture.orderId, pay:current && current.status === 'pending_payment', send:state === 'held', confirm:state === 'transferred', refresh:true, buyer:true, seller:true };
+    Object.keys(enabled).forEach(function(id){ document.getElementById(id).disabled = working || !enabled[id]; });
+    ['reserve','pay','send','confirm'].forEach(function(id){ document.getElementById(id).classList.toggle('current', !!enabled[id]); });
+  }
+  async function refresh(){
+    me = await api('GET','/api/me').catch(function(){ return null; });
+    current = fixture.orderId ? await api('GET','/api/orders/' + fixture.orderId) : null;
+  }
+  function action(id, fn){ document.getElementById(id).onclick = async function(){
+    if (working) return; working = true; display(); document.getElementById('message').textContent = '';
+    try { await fn(); await refresh(); } catch(err){ document.getElementById('message').textContent = err.message; }
+    finally { working = false; display(); }
+  }; }
+  action('new', async function(){ fixture = await api('POST','/api/dev/transfer-fixture',{}); save(); current = null; await role('buyer'); });
+  action('reserve', async function(){ await role('buyer'); var result = await api('POST','/api/orders',{eventId:fixture.eventId,listingId:fixture.listingId,tier:'ga',qty:1,maxPriceCents:1000}); if(!result.matched) throw new Error('Practice listing unavailable. Create another practice ticket.'); fixture.orderId = result.order.id; save(); });
+  action('pay', async function(){ await role('buyer'); await api('POST','/api/orders/' + fixture.orderId + '/pay',{}); });
+  action('send', async function(){ await role('seller'); await refresh(); await api('POST','/api/orders/' + fixture.orderId + '/fills/' + current.fills[0].id + '/transfer',{reference:document.getElementById('reference').value}); });
+  action('confirm', async function(){ await role('buyer'); await refresh(); await api('POST','/api/orders/' + fixture.orderId + '/fills/' + current.fills[0].id + '/confirm',{}); });
+  action('refresh', async function(){});
+  action('buyer', async function(){ await role('buyer'); });
+  action('seller', async function(){ await role('seller'); });
+  refresh().catch(function(err){ document.getElementById('message').textContent = err.message; }).finally(display);
+})();
+</script>
+</html>

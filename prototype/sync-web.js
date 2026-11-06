@@ -13,6 +13,7 @@ const src = fs.readFileSync(path.join(here, 'index.html'), 'utf8');
 
 const page = '<!doctype html>\n<html lang="en">\n<!-- Generated from prototype/index.html by `npm run sync:web`. Edit the prototype, not this file. -->\n' + src.trimEnd() + '\n</html>\n';
 fs.writeFileSync(path.join(root, 'web', 'index.html'), page);
+fs.copyFileSync(path.join(here, 'backend.js'), path.join(root, 'web', 'backend.js'));
 
 // The posters the prototype uses live in web/assets too.
 for (const f of fs.readdirSync(path.join(here, 'assets'))) {

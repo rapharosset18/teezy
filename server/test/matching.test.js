@@ -20,12 +20,12 @@ describe('price priority', () => {
     assert.equal(matchedListing(res), best.id);
   });
 
-  it('charges the listing price, not the buyer max, plus the 5% fee', async () => {
+  it('charges the listing price, not the buyer max, plus the 10% fee', async () => {
     await addListing({ price: 95 });
     const res = await buyAtPrice(order({ maxPriceCents: cents(100) }));
     assert.equal(res.order.subtotalCents, cents(95));
-    assert.equal(res.order.buyerFeeCents, Math.round(cents(95) * 0.05));
-    assert.equal(res.order.totalCents, cents(95) + Math.round(cents(95) * 0.05));
+    assert.equal(res.order.buyerFeeCents, Math.round(cents(95) * 0.1));
+    assert.equal(res.order.totalCents, cents(95) + Math.round(cents(95) * 0.1));
     assert.equal(res.order.fills[0].priceCents, cents(95));
   });
 

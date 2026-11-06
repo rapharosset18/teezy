@@ -2838,7 +2838,7 @@
   // Buyer fee is 5% of the ticket price everywhere; free claimed tickets add the $5 transfer fee.
   function escrowCharges(d){
     if (d.order) return { fee:d.order.buyerFeeCents / 100, transfer:0, total:d.order.totalCents / 100 };
-    var fee = Math.round(d.price * 0.05 * 100) / 100;
+    var fee = Math.round(d.price * 0.1 * 100) / 100;
     var transfer = d.listing.free ? 5 : 0;
     return { fee:fee, transfer:transfer, total:d.price + fee + transfer };
   }

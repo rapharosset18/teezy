@@ -6,13 +6,17 @@ import { config } from './config.js';
 import { query } from './db.js';
 import { AppError, badRequest, notFound, requireInt } from './errors.js';
 import { subscribe } from './realtime.js';
-import { buyAtPrice, getOrder, advanceEscrow } from './services/orders.js';
+import { buyAtPrice, getOrder, advanceEscrow, recordTransfer, confirmTransfer, reportProblem, saveDeliveryProof } from './services/orders.js';
+import { createTransferFixture, testSession } from './services/transferTest.js';
+import { paymentRuntime, stripeClient } from './services/stripe.js';
+import { startCheckout, syncPayment, startSellerOnboarding, getSellerPayments, sellerDashboard, requestRefund, processWebhook, paymentSummary } from './services/payments.js';
 import { createListing, updateListing } from './services/listings.js';
 import { getPriceData } from './services/priceData.js';
 import { listDesired, createDesired, updateDesired, deleteDesired } from './services/desiredTickets.js';
 import { registerPushToken, listNotifications } from './services/push.js';
 import { simulateMarketMove } from './services/devSim.js';
 import { startEmailLogin, verifyEmailLogin, userIdForSession, endSession } from './services/auth.js';
+import { getEvent, listListings, getListing, listOrders } from './services/marketplace.js';
 
 const WEB_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'web');
 const DESIGN_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'design-reference');
@@ -49,7 +53,7 @@ function userId(req) {
 
 const bool = (v) => v === true || v === 'true' || v === '1';
 
-export function buildApp({ logger = false } = {}) {
+export function buildApp({ logger = false, stripe } = {}) {
   const app = Fastify({ logger });
 
   app.setErrorHandler((err, req, reply) => {
@@ -60,7 +64,7 @@ export function buildApp({ logger = false } = {}) {
     return reply.code(500).send({ error: 'internal', message: 'something went wrong' });
   });
 
-  app.register(fastifyStatic, { root: WEB_DIR });
+  app.register(fastifyStatic, { root: WEB_DIR, allowedPath: (file) => !config.isProduction || !file.includes('transfer-test') });
   if (!config.isProduction) {
     // The redesign mocks, rendered as a gallery (design-reference/index.html).
     app.register(fastifyStatic, { root: DESIGN_DIR, prefix: '/design/', decorateReply: false });
@@ -71,6 +75,34 @@ export function buildApp({ logger = false } = {}) {
   });
 
   /* ---------- sign-in: any email, verified with a 6-digit code ---------- */
+  app.get('/api/runtime', async () => ({ ...paymentRuntime(), transferTesting: !config.isProduction }));
+  function paymentUser(req) {
+    if (!req.caller?.signedIn) throw new AppError(401, 'unauthenticated', 'sign in to use payments');
+    return userId(req);
+  }
+  app.get('/api/me/payments', async (req) => paymentSummary(paymentUser(req)));
+  app.get('/api/me/seller-payments', async (req) => getSellerPayments(paymentUser(req), stripe));
+  app.post('/api/me/seller-onboarding', async (req) => startSellerOnboarding(paymentUser(req), stripe));
+  app.post('/api/me/seller-dashboard', async (req) => sellerDashboard(paymentUser(req), stripe));
+  app.post('/api/orders/:id/checkout', async (req) => startCheckout(req.params.id, paymentUser(req), stripe));
+  app.post('/api/orders/:id/payment/sync', async (req) => syncPayment(req.params.id, paymentUser(req), stripe));
+  app.post('/api/orders/:id/refund', async (req) => requestRefund(req.params.id, paymentUser(req), stripe));
+  app.register(async function (webhooks) {
+    // Signature verification must use the original bytes, never re-serialized JSON.
+    webhooks.removeContentTypeParser('application/json');
+    webhooks.addContentTypeParser('application/json', { parseAs: 'buffer' }, (req, body, done) => done(null, body));
+    webhooks.post('/api/webhooks/stripe', async (req) => {
+      const client = stripe || stripeClient();
+      let event;
+      for (const secret of [config.stripeWebhookSecret, config.stripeConnectWebhookSecret].filter(Boolean)) {
+        try { event = client.webhooks.constructEvent(req.body, req.headers['stripe-signature'], secret); break; }
+        catch { /* try the other endpoint's secret */ }
+      }
+      if (!event) throw badRequest('invalid Stripe webhook signature');
+      await processWebhook(event, client);
+      return { received: true };
+    });
+  });
   app.post('/api/auth/email/start', async (req) => {
     const { email, devCode } = await startEmailLogin(req.body?.email);
     return { sent: true, email, devCode };
@@ -115,6 +147,13 @@ export function buildApp({ logger = false } = {}) {
   });
 
   /* ---------- events and the price slider ---------- */
+  app.get('/api/events/:eventId', async (req) => getEvent(req.params.eventId));
+  app.get('/api/listings', async (req) => listListings(req.query));
+  app.get('/api/listings/:id', async (req) => getListing(req.params.id, req.caller?.id));
+  app.get('/api/me/listings', async (req) => listListings(req.query, userId(req)));
+  app.get('/api/me/orders', async (req) => listOrders(userId(req), req.query));
+  app.get('/api/me/sales', async (req) => listOrders(userId(req), req.query, true));
+
   app.get('/api/events', async () => {
     const { rows } = await query(`
       SELECT e.*, array_remove(array_agg(DISTINCT l.tier), NULL) AS tiers
@@ -146,12 +185,30 @@ export function buildApp({ logger = false } = {}) {
 
   app.get('/api/orders/:id', async (req) => getOrder(req.params.id, userId(req)));
 
+  const deliverySchema = { params: { type: 'object', required: ['id', 'fillId'], properties: {
+    id: { type: 'string', pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' },
+    fillId: { type: 'string', pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' },
+  } } };
+  app.post('/api/orders/:id/fills/:fillId/transfer', { schema: deliverySchema }, async (req) =>
+    recordTransfer(req.params.id, req.params.fillId, userId(req), req.body?.reference));
+  app.post('/api/orders/:id/fills/:fillId/confirm', { schema: deliverySchema }, async (req) =>
+    confirmTransfer(req.params.id, req.params.fillId, userId(req)));
+  app.post('/api/orders/:id/fills/:fillId/proof', { schema: deliverySchema, bodyLimit: 8 * 1024 * 1024 }, async (req) =>
+    saveDeliveryProof(req.params.id, req.params.fillId, userId(req), req.body || {}));
+  app.post('/api/orders/:id/fills/:fillId/report', { schema: deliverySchema }, async (req) =>
+    reportProblem(req.params.id, req.params.fillId, userId(req), req.body?.reason));
+
   app.post('/api/orders/:id/:step', async (req) => {
     const { step } = req.params;
     if (!['pay', 'transfer', 'confirm', 'release'].includes(step)) throw notFound('route');
-    if ((step === 'transfer' || step === 'release') && config.isProduction) {
-      throw badRequest(`${step} is done by the seller or the payout job, not the buyer`);
+    if (step === 'pay') {
+      const { rows: [order] } = await query('SELECT buyer_id FROM orders WHERE id=$1', [req.params.id]);
+      const localFixture = !config.isProduction && order?.buyer_id === 'transfer-test-buyer';
+      if (!localFixture && (config.isProduction || config.paymentProvider !== 'demo')) throw badRequest('use Stripe checkout to pay for this order');
+      const { rows } = await query('SELECT order_id FROM payments WHERE order_id=$1', [req.params.id]);
+      if (rows.length) throw badRequest('this order must be paid through Stripe checkout');
     }
+    if (step === 'transfer' || step === 'release') throw badRequest('use the seller transfer action; payouts are not configured yet');
     return advanceEscrow(req.params.id, userId(req), step);
   });
 
@@ -195,6 +252,12 @@ export function buildApp({ logger = false } = {}) {
 
   /* ---------- demo only ---------- */
   if (!config.isProduction) {
+    app.post('/api/dev/transfer-fixture', async () => createTransferFixture());
+    app.post('/api/dev/test-session', async (req, reply) => {
+      const token = await testSession(req.body?.role);
+      reply.header('set-cookie', sessionCookie(token, 24 * 60 * 60));
+      return { role: req.body.role };
+    });
     // Another seller lists or reprices near a desired ticket, through the real pipeline.
     app.post('/api/dev/market-move', async (req) => simulateMarketMove(userId(req), req.body?.desiredTicketId));
   }

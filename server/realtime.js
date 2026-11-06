@@ -15,7 +15,7 @@ export async function startRealtime() {
     let event;
     try { event = JSON.parse(msg.payload); } catch { return; }
     for (const s of streams) {
-      if (event.type === 'notification' && event.userId !== s.userId) continue;
+      if (event.userId && event.userId !== s.userId) continue;
       s.send(event);
     }
   });

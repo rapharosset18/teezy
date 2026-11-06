@@ -27,6 +27,8 @@ export async function startEmbeddedPg({ dir, port, database = 'teezy', persisten
     user: 'teezy',
     password: 'teezy',
     persistent,
+    // Keep local database initialization independent of the shell's locale.
+    initdbFlags: ['--locale=C', '--encoding=UTF8'],
     onLog: () => {},
   });
   if (!fs.existsSync(path.join(dir, 'PG_VERSION'))) await pg.initialise();

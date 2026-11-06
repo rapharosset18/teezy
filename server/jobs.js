@@ -7,6 +7,7 @@ import { config } from './config.js';
 export const QUEUES = {
   listingChanged: 'listing-changed',   // { listingId, trigger: 'created' | 'price_drop' }
   orderExpire: 'order-expire',         // { orderId }
+  payments: 'payment-reconciliation',
 };
 
 let boss = null;
@@ -34,6 +35,7 @@ export function enqueue(client, name, data, options = {}) {
 // Runs the handlers in this process. In production run this in a separate worker process.
 export async function startWorkers(handlers, { pollingIntervalSeconds = 2 } = {}) {
   await startBoss();
+  await boss.schedule(QUEUES.payments, '* * * * *', {});
   for (const [name, handler] of Object.entries(handlers)) {
     await boss.work(name, { pollingIntervalSeconds }, async (jobs) => {
       for (const job of jobs) await handler(job.data);

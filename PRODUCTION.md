@@ -21,7 +21,7 @@ Rules:
 
 - **Price, then time.** The lowest price wins. At the same price, the earliest
   `priority_timestamp` wins, then the listing id breaks any remaining tie.
-- **Buyer pays the listing price**, never their max, plus the 5% buyer fee.
+- **Buyer pays the listing price**, never their max, plus the 10% buyer fee.
 - **One seller per order by default**, so seats stay together. With `allowSplit`, an order
   fills across sellers in priority order and opens one escrow per seller.
 - **All-or-nothing.** A buyer who wants 2 tickets never gets 1.
@@ -73,8 +73,8 @@ live `book` event. It counts "N available" on the client as the slider moves.
 | Area | Today (demo) | Production |
 |---|---|---|
 | Sign-in | Email + 6-digit code, any address, session cookie. Dev: the code is printed to the server log and filled in for you; signed-out calls act as `mia` | `NODE_ENV=production` refuses signed-out calls and never returns the code; set `EMAIL_PROVIDER=resend`, `RESEND_API_KEY` and `EMAIL_FROM` on a domain you verify with Resend |
-| Payment | `POST /orders/:id/pay` marks the money held | A payment provider authorization (e.g. Stripe manual capture) in `advanceEscrow('pay')`; capture or refund on release |
-| Transfer / release | Buttons in the demo call `/transfer` and `/release` (disabled in production) | Seller action plus a job scheduled after the event |
+| Payment | Demo `/pay` remains available for local practice. Stripe Checkout, verified webhooks, refunds, and transaction records are implemented | Configure a Stripe sandbox first; complete the tests in [PAYMENTS.md](PAYMENTS.md). Live keys require explicit enablement and HTTPS. Payment is captured at checkout, with delayed seller transfers |
+| Transfer / release | Per-fill seller transfer recording and buyer confirmation persist in the database. The old buyer transfer/release shortcuts are blocked | Stripe seller transfers run after buyer confirmation and the configured delay after event start. Support, dispute review, and operational monitoring remain launch work |
 | Push | `PUSH_PROVIDER=dev`: banner over SSE | `PUSH_PROVIDER=expo`, with the app registering tokens at `POST /api/push-tokens`. Expo delivers to APNs and FCM. Untested against Expo's live API. |
 | Worker | Runs inside the API process (`npm run dev`) | Separate process calling `startWorker()` from `server/worker.js` |
 | Database | `embedded-postgres` in `.pgdata` | Managed Postgres; `DATABASE_URL=… npm run migrate` |

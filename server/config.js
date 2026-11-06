@@ -9,8 +9,16 @@ export const config = {
   port: num('PORT', 3000),
   databaseUrl: env.DATABASE_URL || 'postgres://teezy:teezy@localhost:54329/teezy',
   isProduction: env.NODE_ENV === 'production',
+  paymentProvider: env.PAYMENT_PROVIDER || 'demo',
+  stripeSecretKey: env.STRIPE_SECRET_KEY || '',
+  stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET || '',
+  stripeConnectWebhookSecret: env.STRIPE_CONNECT_WEBHOOK_SECRET || '', // Stripe gives connected-account events their own endpoint and secret
+  allowLivePayments: env.ALLOW_LIVE_PAYMENTS === 'true',
+  publicUrl: env.PUBLIC_URL || 'http://localhost:3000',
+  payoutDelayHours: num('PAYOUT_DELAY_HOURS', 24),
+  autoConfirmHours: num('AUTO_CONFIRM_HOURS', 24), // hours after event start before an unreported delivery counts as received
 
-  buyerFeeRate: 0.05,                          // 5% buyer fee on top of the ticket price
+  buyerFeeRate: 0.10,                          // 10% buyer fee on top of the ticket price
   paymentWindowMs: num('PAYMENT_WINDOW_MS', 5 * 60 * 1000), // matched seats are reserved this long while the buyer pays
   matchDeadlineMs: num('MATCH_DEADLINE_MS', 5000), // max time a buyer waits on other checkouts before "try again"
 

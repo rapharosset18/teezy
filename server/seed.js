@@ -42,12 +42,17 @@ const PAST_SALES = [
 ];
 
 export const DEMO_TABLES = [
+  'payment_webhooks', 'payment_ledger', 'seller_transfers', 'payments', 'seller_accounts',
   'sessions', 'email_login_codes', 'notifications', 'push_tokens', 'desired_ticket_notifications', 'desired_tickets',
   'order_fills', 'orders', 'listings', 'events', 'users',
 ];
 
 export async function resetDemoData() {
-  await withTransaction((client) => client.query(`TRUNCATE ${DEMO_TABLES.join(', ')} CASCADE`));
+  await withTransaction(async (client) => {
+    const { rows: [{ n }] } = await client.query('SELECT count(*)::int AS n FROM payments');
+    if (n) throw new Error('Demo reset cannot delete Stripe payment records. Use a separate empty database for a new demo.');
+    await client.query(`TRUNCATE ${DEMO_TABLES.join(', ')} CASCADE`);
+  });
 }
 
 export async function seedDemoData() {
@@ -72,7 +77,7 @@ export async function seedDemoData() {
          VALUES ($1, 'past-seller', $2, $3, 1, 0, 'sold', ${when}) RETURNING id`,
         [event, tier, price * 100],
       );
-      const fee = Math.round(price * 100 * 0.05);
+      const fee = Math.round(price * 100 * 0.1);
       const { rows: [o] } = await client.query(
         `INSERT INTO orders (buyer_id, event_id, tier, qty, max_price_cents, subtotal_cents, buyer_fee_cents, total_cents,
                              status, payment_expires_at, paid_at, created_at)
