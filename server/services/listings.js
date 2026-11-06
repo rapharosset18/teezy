@@ -1,6 +1,7 @@
-import { withTransaction, notify } from '../db.js';
+import { query, withTransaction, notify } from '../db.js';
 import { enqueue, QUEUES } from '../jobs.js';
-import { badRequest, notFound, forbidden, requireInt } from '../errors.js';
+import { badRequest, conflict, notFound, forbidden, requireInt } from '../errors.js';
+import { paymentRuntime } from './stripe.js';
 import { alertTrigger } from '../engine/rules.js';
 
 function listingDto(r) {
@@ -34,6 +35,10 @@ export async function createListing(sellerId, input) {
   if (!input.tier) throw badRequest('tier is required');
   const priceCents = requireInt(input.priceCents, 'priceCents', { min: 1 });
   const qty = requireInt(input.qty ?? 1, 'qty', { min: 1, max: 20 });
+  if (paymentRuntime().stripePayments) {
+    const { rows: [account] } = await query('SELECT transfers_enabled FROM seller_accounts WHERE user_id = $1', [sellerId]);
+    if (!account?.transfers_enabled) throw conflict('seller_not_ready', 'connect seller payouts before listing tickets');
+  }
   return withTransaction(async (client) => {
     const { rows: [row] } = await client.query(
       `INSERT INTO listings (event_id, seller_id, tier, section, seat_label, description,

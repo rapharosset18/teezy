@@ -8,6 +8,7 @@ import { resetDb, addListing, order } from './helpers.js';
 import { buyAtPrice, expireOrder, getOrder, recordTransfer, confirmTransfer, reportProblem, saveDeliveryProof } from '../services/orders.js';
 import { startCheckout, processWebhook, startSellerOnboarding, getSellerPayments, requestRefund, paymentSweep, syncPayment, disputeReport } from '../services/payments.js';
 import { stripeClient } from '../services/stripe.js';
+import { createListing } from '../services/listings.js';
 
 function fakeStripe() {
   const sessions = new Map(), transfers = new Map(), refunds = new Map(), calls = [];
@@ -466,7 +467,7 @@ describe('Stripe marketplace payments', () => {
     assert.equal((await payment(o.id)).status, 'succeeded');
     await paymentSweep(stripe); await paymentSweep(stripe);
     const row = await transferRow(o);
-    assert.equal(row.status, 'transferred'); assert.equal(row.covered, true);
+    assert.equal(row.status, 'transferred'); assert.equal(row.covered, false);
     assert.equal(stripe.transfersMade.size, 2);
     assert.equal([...stripe.transfersMade.values()].at(-1).source_transaction, undefined);
     assert.ok(await blocked());
@@ -531,6 +532,32 @@ describe('Stripe marketplace payments', () => {
     await processWebhook({ id: 'evt_other', type: 'charge.dispute.created', livemode: false,
       data: { object: { id: 'dp_other', object: 'dispute', charge: 'ch_other', amount: 100 } } }, stripe);
     assert.ok((await query("SELECT processed_at FROM payment_webhooks WHERE event_id='evt_other'")).rows[0].processed_at);
+  });
+
+  it('stops a seller marking a ticket sent while a refund is pending or done', async () => {
+    const { order: o, session } = await checkout(); await markPaid(session);
+    await query("UPDATE payments SET status='refund_pending' WHERE order_id=$1", [o.id]);
+    await assert.rejects(recordTransfer(o.id, o.fills[0].id, 's1', 'REF'), { code: 'refunded' });
+    await query("UPDATE payments SET status='refunded' WHERE order_id=$1", [o.id]);
+    await query("UPDATE orders SET status='cancelled' WHERE id=$1", [o.id]);
+    await assert.rejects(recordTransfer(o.id, o.fills[0].id, 's1', 'REF'), { code: 'refunded', message: /refunded/ });
+  });
+
+  it('requires connected payouts before listing when Stripe is on', async () => {
+    const eventId = (await query('SELECT id FROM events LIMIT 1')).rows[0].id;
+    const input = { eventId, tier: 'ga', priceCents: 2000 };
+    await assert.rejects(createListing('s3', input), { code: 'seller_not_ready' });
+    await assert.rejects(createListing('s1', input), { code: 'seller_not_ready' }); // connected but not approved
+    await query("UPDATE seller_accounts SET transfers_enabled=true WHERE user_id='s1'");
+    assert.equal((await createListing('s1', input)).priceCents, 2000);
+  });
+
+  it('answers a malformed request as a client error, not a server failure', async () => {
+    const app = buildApp({ stripe });
+    try {
+      const res = await app.inject({ method: 'POST', url: '/api/auth/email/start', headers: { 'content-type': 'application/json' } });
+      assert.equal(res.statusCode, 400);
+    } finally { await app.close(); }
   });
 
   it('pays each seller only for their confirmed fill on a split order', async () => {

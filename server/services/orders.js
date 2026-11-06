@@ -190,6 +190,8 @@ export async function recordTransfer(orderId, fillId, sellerId, reference) {
     const { rows: [fill] } = await client.query('SELECT * FROM order_fills WHERE id = $1 AND order_id = $2', [fillId, orderId]);
     if (!fill) throw notFound('ticket');
     if (fill.seller_id !== sellerId) throw forbidden('only the seller can record this transfer');
+    const { rows: [payment] } = await client.query('SELECT status FROM payments WHERE order_id = $1', [orderId]);
+    if (['refund_pending', 'refunded'].includes(payment?.status)) throw conflict('refunded', 'this order was refunded, so do not send the tickets');
     if (o.status !== 'paid') throw conflict('not_paid', 'the buyer must pay first');
     if (fill.escrow_status !== 'held') throw conflict('wrong_step', 'this ticket is not waiting for transfer');
     await client.query(`UPDATE order_fills SET escrow_status = 'transferred', transfer_reference = $2,

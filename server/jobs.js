@@ -3,6 +3,7 @@
 // rolled-back listing write never sends alerts and a committed one always queues them.
 import { PgBoss } from 'pg-boss';
 import { config } from './config.js';
+import { reportError } from './alerts.js';
 
 export const QUEUES = {
   listingChanged: 'listing-changed',   // { listingId, trigger: 'created' | 'price_drop' }
@@ -38,7 +39,11 @@ export async function startWorkers(handlers, { pollingIntervalSeconds = 2 } = {}
   await boss.schedule(QUEUES.payments, '* * * * *', {});
   for (const [name, handler] of Object.entries(handlers)) {
     await boss.work(name, { pollingIntervalSeconds }, async (jobs) => {
-      for (const job of jobs) await handler(job.data);
+      for (const job of jobs) {
+        // pg-boss stores a failed job silently, so report it before it retries.
+        try { await handler(job.data); }
+        catch (err) { await reportError(`job ${name}`, err); throw err; }
+      }
     });
   }
 }

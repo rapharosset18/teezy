@@ -39,6 +39,9 @@ that a particular Stripe account has been approved or configured correctly.
 - A buyer is blocked from buying after a dispute Teezy wins, or a loss against proof. Unblock
   by clearing `users.payment_blocked_at`. Lost disputes can include real card fraud.
 - `npm run payments:report` shows the 90-day lost-chargeback rate and warns at 0.5%.
+- Sellers must have payouts connected before listing, and can't mark a refunded order sent.
+- Server and background job failures are logged. Set `ALERT_WEBHOOK_URL` to a Slack-compatible
+  webhook to also get alerts, at most once an hour for each distinct failure.
 - Stripe can send a dispute before its payment is saved. The worker replays unprocessed events
   from Stripe's copy for 3 days, except connected-account events.
 - Sandbox outcomes need `uncategorized_text` to equal exactly `winning_evidence` or `losing_evidence`,

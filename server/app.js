@@ -9,6 +9,7 @@ import { subscribe } from './realtime.js';
 import { buyAtPrice, getOrder, advanceEscrow, recordTransfer, confirmTransfer, reportProblem, saveDeliveryProof } from './services/orders.js';
 import { createTransferFixture, testSession } from './services/transferTest.js';
 import { paymentRuntime, stripeClient } from './services/stripe.js';
+import { reportError } from './alerts.js';
 import { startCheckout, syncPayment, startSellerOnboarding, getSellerPayments, sellerDashboard, requestRefund, processWebhook, paymentSummary } from './services/payments.js';
 import { createListing, updateListing } from './services/listings.js';
 import { getPriceData } from './services/priceData.js';
@@ -60,7 +61,8 @@ export function buildApp({ logger = false, stripe } = {}) {
     if (err instanceof AppError) return reply.code(err.status).send({ error: err.code, message: err.message });
     if (err.code === '23503') return reply.code(400).send({ error: 'bad_reference', message: 'unknown event, user or listing' });
     if (err.validation) return reply.code(400).send({ error: 'bad_request', message: err.message });
-    req.log.error(err);
+    if (err.statusCode >= 400 && err.statusCode < 500) return reply.code(err.statusCode).send({ error: 'bad_request', message: err.message });
+    reportError(`${req.method} ${req.routeOptions?.url ?? req.url}`, err);
     return reply.code(500).send({ error: 'internal', message: 'something went wrong' });
   });
 

@@ -16,6 +16,7 @@ export const config = {
   allowLivePayments: env.ALLOW_LIVE_PAYMENTS === 'true',
   publicUrl: env.PUBLIC_URL || 'http://localhost:3000',
   payoutDelayHours: num('PAYOUT_DELAY_HOURS', 24),
+  alertWebhookUrl: env.ALERT_WEBHOOK_URL || '', // optional Slack-compatible webhook for failures
   autoConfirmHours: num('AUTO_CONFIRM_HOURS', 24), // hours after event start before an unreported delivery counts as received
 
   buyerFeeRate: 0.10,                          // 10% buyer fee on top of the ticket price

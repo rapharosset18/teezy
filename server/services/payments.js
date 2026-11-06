@@ -352,8 +352,8 @@ async function platformPayout(fillId, reason, stripe) {
     const transfer = await stripe.transfers.create({ amount, currency: 'usd', destination: account.stripe_account_id, transfer_group: `teezy_${f.order_id}`,
       metadata: { orderId: f.order_id, fillId: f.id, teezyPayout: reason } }, key(`transfer-${reason}`, f.id));
     await db.query(`INSERT INTO seller_transfers(fill_id,seller_id,amount_cents,stripe_transfer_id,status,transferred_at,covered)
-      VALUES ($1,$2,$3,$4,'transferred',now(),true) ON CONFLICT(fill_id) DO UPDATE SET stripe_transfer_id=EXCLUDED.stripe_transfer_id,
-      status='transferred',transferred_at=now(),covered=true,updated_at=now()`, [f.id, f.seller_id, amount, transfer.id]);
+      VALUES ($1,$2,$3,$4,'transferred',now(),$5) ON CONFLICT(fill_id) DO UPDATE SET stripe_transfer_id=EXCLUDED.stripe_transfer_id,
+      status='transferred',transferred_at=now(),covered=EXCLUDED.covered,updated_at=now()`, [f.id, f.seller_id, amount, transfer.id, reason === 'cover']);
     await db.query("UPDATE order_fills SET escrow_status='released',updated_at=now() WHERE id=$1", [f.id]);
     await ledger(db, f.order_id, 'transfer', -amount, transfer.id, f.id);
     await notify(db, { type: 'order', orderId: f.order_id, userId: f.seller_id });

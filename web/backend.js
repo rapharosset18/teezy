@@ -132,8 +132,10 @@ window.installTeezyBackend = function (ui) {
       await refresh();
       var params = new URLSearchParams(location.search), orderId = params.get('order');
       if (params.get('payment') && orderId && me) {
-        if (params.get('payment') === 'return') await api('POST', '/api/orders/' + orderId + '/payment/sync');
-        await refresh(); S.overlay = { k: 'order', id: orderId };
+        // A link for an order on another account shouldn't take down the whole app.
+        if (params.get('payment') === 'return') await api('POST', '/api/orders/' + orderId + '/payment/sync').catch(function (err) { if (err.status !== 403 && err.status !== 404) throw err; });
+        await refresh();
+        if (orders.some(function (o) { return o.id === orderId; })) S.overlay = { k: 'order', id: orderId }; else ui.toast('That order belongs to a different account.');
         history.replaceState(null, '', location.pathname);
       } else if (params.get('seller')) {
         S.overlay = { k: 'payouts' }; history.replaceState(null, '', location.pathname);
@@ -212,7 +214,7 @@ window.installTeezyBackend = function (ui) {
     if (!me) return accountPrompt('Sell tickets');
     var selected = S.sellEvent || ui.UPCOMING[0];
     return shell('Sell tickets', note('List a ticket you own and can transfer through the official ticketing service.') +
-      (runtime.stripePayments ? note(sellerPayments.ready ? 'Seller payouts connected.' : 'Connect seller payouts before buyers can pay for your listings.') + button('Seller payouts', 'payouts', '', true) : '') +
+      (runtime.stripePayments ? note(sellerPayments.ready ? 'Seller payouts connected.' : 'Connect seller payouts before you can list tickets.') + button('Seller payouts', 'payouts', '', true) : '') +
       (ui.UPCOMING.length ? '<form data-backend="listing" class="stack"><label class="stack">Event<select class="field" name="eventId">' + ui.UPCOMING.map(function (id) { return '<option value="' + esc(id) + '"' + (selected === id ? ' selected' : '') + '>' + esc(eventName(id)) + '</option>'; }).join('') + '</select></label>' +
         '<label class="stack">Ticket type<select class="field" name="tier"><option value="ga">General admission</option><option value="student">Student</option><option value="reserved">Reserved</option><option value="entry">Entry</option></select></label>' +
         input('Section', 'section', 'text', '', 'maxlength="100"') + input('Row / seat or transfer details', 'seatLabel', 'text', '', 'maxlength="200"') +
@@ -224,7 +226,7 @@ window.installTeezyBackend = function (ui) {
     var content = paymentNote() + button('Payments and payouts', 'payouts', '', true) + '<div class="stat-grid"><div class="stat"><span class="k">Orders</span><span class="v">' + orders.length + '</span></div><div class="stat"><span class="k">Active listings</span><span class="v">' + S.selling.filter(function (s) { return !s.sold; }).length + '</span></div></div>';
     content += '<h2 class="h2">Needs you</h2>';
     orders.filter(function (o) { return o.status === 'pending_payment' || o.fills.some(function (f) { return f.escrowStatus === 'transferred'; }); }).forEach(function (o) { content += purchaseCard(o); });
-    sales.forEach(function (o) { o.fills.filter(function (f) { return f.escrowStatus === 'held' || f.problemReportedAt || (!f.hasProof && ['transferred', 'confirmed', 'released'].indexOf(f.escrowStatus) >= 0); }).forEach(function (f) { content += saleCard(o, f); }); });
+    sales.forEach(function (o) { o.fills.filter(function (f) { return ['held', 'transferred', 'confirmed'].indexOf(f.escrowStatus) >= 0 || f.problemReportedAt || (!f.hasProof && f.escrowStatus === 'released'); }).forEach(function (f) { content += saleCard(o, f); }); });
     return shell('Dashboard', content + button('Refresh account', 'reload', '', true));
   };
   V.inbox = function () { return me ? shell('Inbox', notifications.length ? notifications.map(function (n) { return '<div class="card"><span class="lt">' + esc(n.title) + '</span>' + note(n.body) + '</div>'; }).join('') : empty('No notifications yet. Transfer updates appear in My Tickets.')) : accountPrompt('Inbox'); };
@@ -264,7 +266,7 @@ window.installTeezyBackend = function (ui) {
         (f.problemReportedAt ? note('Problem reported. The seller’s payment is paused while Teezy reviews it.') : '') +
         (f.escrowStatus === 'transferred' ? note('Confirm only after checking that the tickets arrived in your official ticketing account.') + button('Confirm receipt', 'confirmfill', 'data-order="' + order.id + '" data-fill="' + f.id + '"') +
           (f.problemReportedAt ? '' : button('Report a problem', 'reportfill', 'data-order="' + order.id + '" data-fill="' + f.id + '"', true) +
-            note('If you do nothing, this confirms automatically ' + runtime.autoConfirmHours + ' hours after the event starts.')) : '') + '</div>'; }).join('') +
+            (paymentFor(order.id) && paymentFor(order.id).status === 'succeeded' ? note('If you do nothing, this confirms automatically ' + runtime.autoConfirmHours + ' hours after the event starts.') : '')) : '') + '</div>'; }).join('') +
       note('This screen tracks delivery. It does not contain a scannable admission ticket.'));
   };
   O.report = function (o) {
@@ -362,7 +364,7 @@ window.installTeezyBackend = function (ui) {
       } else if (kind === 'proof') {
         if (!values.proof || !values.proof.size) throw new Error('Choose a file first.');
         await api('POST', '/api/orders/' + form.dataset.order + '/fills/' + form.dataset.fill + '/proof', await readProof(values.proof));
-        S.overlay = null; await refresh(); ui.toast('Proof saved.');
+        S.overlay = null; await refresh(); ui.toast('Proof saved. You’re covered if the buyer files a chargeback.');
       } else if (kind === 'report') {
         await api('POST', '/api/orders/' + form.dataset.order + '/fills/' + form.dataset.fill + '/report', { reason: values.reason });
         await refresh(); ui.sheet({ k: 'order', id: form.dataset.order }); ui.toast('Problem reported. The seller’s payment is paused.');
