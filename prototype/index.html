@@ -208,10 +208,13 @@
   .hscroll::-webkit-scrollbar{ display:none; }
   .rowhead{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .rowctl{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
-  .erow{ display:flex; gap:12px; overflow-x:auto; margin:0 -18px; padding:6px 18px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .erow{ display:flex; gap:12px; overflow-x:auto; margin:0 -18px; padding:6px 18px 14px; scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; scroll-padding:0 18px; overscroll-behavior-x:contain; }
   .erow::-webkit-scrollbar{ display:none; }
-  /* Cards follow the scroll: the one in focus is full size, the rest ease back (springy curve). */
-  .ecard{ position:relative; flex:0 0 240px; transition:transform .32s cubic-bezier(.34,1.4,.64,1), opacity .32s ease; will-change:transform; }
+  /* Cards follow the scroll: the one in focus is full size, the rest ease back. The scale is set
+     every frame while scrolling, so there is no transition to lag behind the finger, and the card
+     is only its own layer while the row moves, so it redraws sharp once the row stops. */
+  .ecard{ position:relative; flex:0 0 240px; scroll-snap-align:start; }
+  .erow.moving .ecard{ will-change:transform, opacity; }
   /* Coming up: connected carousel cards, joined by curved bridges */
   .erow.connected{ gap:14px; }
   .erow.connected .ecard-main{ background:var(--surface-2); border:none; border-radius:24px; box-shadow:0 8px 18px -10px rgba(95,109,119,.35); }
@@ -235,7 +238,7 @@
   .ecard-foot .n{ display:inline-flex; align-items:center; gap:4px; }
   .ecard-foot .n svg{ width:14px; height:14px; }
   .ecard-foot b{ color:var(--ink); font-weight:900; font-size:.9rem; font-variant-numeric:tabular-nums; }
-  .ecard-heart{ position:absolute; top:8px; right:8px; width:34px; height:34px; border-radius:50%; border:none; background:rgba(255,255,255,.88); color:#0E0E10; display:grid; place-items:center; padding:0; }
+  .ecard-heart{ position:absolute; top:8px; right:8px; width:34px; height:34px; border-radius:50%; border:none; background:#FFFFFF; box-shadow:0 2px 8px -2px rgba(0,0,0,.45); color:#0E0E10; display:grid; place-items:center; padding:0; }
   .ecard-heart.on{ background:var(--accent); box-shadow:inset 0 0 0 1.5px #0E0E10; color:#0E0E10; }
   .ecard-heart svg{ width:18px; height:18px; }
   /* Home: watchlist chips, near-you map, more-events grid */
@@ -2769,26 +2772,41 @@ function renderOverlay(){
 /* ---- card rows: scroll-linked animation, and Coming up autoplay ---- */
 function reducedMotion(){ return matchMedia('(prefers-reduced-motion: reduce)').matches; }
 // The focus point slides from the first card to the last as the row scrolls, so every card gets its turn.
+// Card sizes and positions are measured once per row (and again on resize), so scrolling only reads scrollLeft.
+var ROW_GEO = new WeakMap();
+function rowGeo(row){
+  var g = ROW_GEO.get(row);
+  if (!g || g.n !== row.children.length || g.cw !== row.clientWidth){
+    var card = row.firstElementChild, w = card.offsetWidth;
+    g = { n:row.children.length, cw:row.clientWidth, w:w, max:row.scrollWidth - row.clientWidth, step:w + (parseFloat(getComputedStyle(row).columnGap) || 12),
+      mids:Array.prototype.map.call(row.children, function(c){ return c.offsetLeft + c.offsetWidth / 2; }) };
+    ROW_GEO.set(row, g);
+  }
+  return g;
+}
 function rowFocus(row){
-  var card = row.firstElementChild, w = card.offsetWidth, max = row.scrollWidth - row.clientWidth;
-  var travel = row.clientWidth - 36 - w;
-  return { x:row.scrollLeft + 18 + w / 2 + (max > 0 ? travel * row.scrollLeft / max : 0), step:w + parseFloat(getComputedStyle(row).columnGap || 12) };
+  var g = rowGeo(row), left = row.scrollLeft, travel = g.cw - 36 - g.w;
+  return { x:left + 18 + g.w / 2 + (g.max > 0 ? travel * Math.min(left / g.max, 1) : 0), step:g.step, mids:g.mids };
 }
 function nearestCard(row){
   var f = rowFocus(row), best = 0, bestD = Infinity;
-  Array.prototype.forEach.call(row.children, function(c, i){ var d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - f.x); if (d < bestD){ bestD = d; best = i; } });
+  f.mids.forEach(function(m, i){ var d = Math.abs(m - f.x); if (d < bestD){ bestD = d; best = i; } });
   return best;
 }
 function animateRow(row){
   if (!row.firstElementChild) return;
   var f = rowFocus(row), calm = reducedMotion();
-  Array.prototype.forEach.call(row.children, function(c){
-    var d = (c.offsetLeft + c.offsetWidth / 2 - f.x) / f.step, a = calm ? 0 : Math.min(Math.abs(d), 1);
+  Array.prototype.forEach.call(row.children, function(c, i){
+    var d = (f.mids[i] - f.x) / f.step, a = calm ? 0 : Math.min(Math.abs(d), 1);
+    var t = a > .002 ? 'translate3d(0,' + (a * 8).toFixed(1) + 'px,0) scale(' + (1 - a * .07).toFixed(3) + ')' : '';
+    if (c._t === t) return;
+    c._t = t;
     c.style.transformOrigin = d < 0 ? 'right center' : 'left center';
-    c.style.transform = a ? 'translateY(' + (a * 8).toFixed(1) + 'px) scale(' + (1 - a * .07).toFixed(3) + ')' : '';
-    c.style.opacity = a ? (1 - a * .3).toFixed(2) : '';
+    c.style.transform = t;
+    c.style.opacity = t ? (1 - a * .3).toFixed(2) : '';
   });
 }
+window.addEventListener('resize', function(){ ROW_GEO = new WeakMap(); document.querySelectorAll('.erow').forEach(animateRow); });
 var auto = { idx:0, timer:null, paused:false, resume:null, gliding:0 };
 function comingRow(){ return document.getElementById('row-coming'); }
 function setPills(i){
@@ -2828,11 +2846,19 @@ function holdAuto(on){
   if (on) stopAuto();
   else auto.resume = setTimeout(function(){ var row = comingRow(); if (row){ auto.idx = nearestCard(row); setPills(auto.idx); } startAuto(); }, 1500);
 }
+// One update per frame however many scroll events arrive; the row is marked as moving until it settles.
 document.addEventListener('scroll', function(e){
   var row = e.target;
   if (!row.classList || !row.classList.contains('erow')) return;
-  animateRow(row);
-  if (row.id === 'row-coming' && Date.now() - auto.gliding > 700){ var i = nearestCard(row); if (i !== auto.idx){ auto.idx = i; setPills(i); if (!auto.paused) startAuto(); } }
+  if (!row._moving){ row._moving = true; row.classList.add('moving'); }
+  clearTimeout(row._still);
+  row._still = setTimeout(function(){ row._moving = false; row.classList.remove('moving'); }, 160);
+  if (row._raf) return;
+  row._raf = requestAnimationFrame(function(){
+    row._raf = 0;
+    animateRow(row);
+    if (row.id === 'row-coming' && Date.now() - auto.gliding > 700){ var i = nearestCard(row); if (i !== auto.idx){ auto.idx = i; setPills(i); if (!auto.paused) startAuto(); } }
+  });
 }, true);
 ['pointerdown', 'touchstart', 'wheel'].forEach(function(t){
   document.addEventListener(t, function(e){ if (e.target.closest && e.target.closest('#row-coming')) holdAuto(true); }, { passive:true, capture:true });
