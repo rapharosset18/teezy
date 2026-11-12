@@ -14,7 +14,8 @@ const transports = {
       headers: { authorization: `Bearer ${config.resendApiKey}`, 'content-type': 'application/json' },
       body: JSON.stringify({ from: config.emailFrom, to: message.to, subject: message.subject, text: message.text }),
     });
-    if (!res.ok) throw new Error(`resend failed: ${res.status}`);
+    // Resend's JSON says why (unverified domain, bad key, bad From), so keep it in the log.
+    if (!res.ok) throw new Error(`resend failed: ${res.status} ${(await res.text().catch(() => '')).slice(0, 300)}`);
   },
 };
 
