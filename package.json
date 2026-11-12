@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "node --env-file-if-exists=.env server/scripts/dev.js",
+    "start": "node server/scripts/start.js",
     "design": "node server/scripts/design.js",
     "sync:web": "node prototype/sync-web.js",
     "payments:listen": "node --env-file=.env server/scripts/payments-listen.js",

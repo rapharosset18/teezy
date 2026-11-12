@@ -14,7 +14,9 @@ const USERS = [
 ];
 
 const EVENTS = [
+  ['fb-asu', 'USC vs Arizona State', 'Coliseum', '2026-11-14T19:30:00-08:00'],
   ['fb-nd', 'USC vs Oregon', 'Coliseum', '2026-11-21T17:00:00-08:00'],
+  ['fb-osu', 'USC vs Ohio State', 'Coliseum', '2026-11-28T12:30:00-08:00'],
   ['sigchi-formal', 'Sigma Chi Formal', 'Off-campus venue', '2026-11-08T21:00:00-08:00'],
   ['aka-social', 'AKA Fall Social', 'Off-campus venue', '2026-10-31T21:00:00-07:00'],
 ];
@@ -55,7 +57,8 @@ export async function resetDemoData() {
   });
 }
 
-export async function seedDemoData() {
+// listings: false skips the sample sellers' listings, for a hosted test where real people list tickets.
+export async function seedDemoData({ listings = true } = {}) {
   await withTransaction(async (client) => {
     for (const [id, name, rating] of USERS) {
       await client.query('INSERT INTO users (id, display_name, rating) VALUES ($1, $2, $3)', [id, name, rating]);
@@ -63,7 +66,7 @@ export async function seedDemoData() {
     for (const [id, name, venue, startsAt] of EVENTS) {
       await client.query('INSERT INTO events (id, name, venue, starts_at) VALUES ($1, $2, $3, $4)', [id, name, venue, startsAt]);
     }
-    for (const [seller, event, tier, section, seat, price, qty, ago] of LISTINGS) {
+    for (const [seller, event, tier, section, seat, price, qty, ago] of listings ? LISTINGS : []) {
       await client.query(
         `INSERT INTO listings (event_id, seller_id, tier, section, seat_label, price_cents, qty_total, qty_available, priority_timestamp, created_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $7, now() - $8 * interval '1 minute', now() - $8 * interval '1 minute')`,
