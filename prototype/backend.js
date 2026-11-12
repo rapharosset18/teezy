@@ -7,9 +7,9 @@ window.installTeezyBackend = function (ui) {
   var orders = [], sales = [], notifications = [], desired = [], catalog = [];
   var sellerPayments = { ready: false }, transactions = { payments: [], transfers: [] };
   var login = { email: '', code: '', sent: false, hint: '' }, stream;
-  var originalHome = V.home, originalSearch = V.search;
+  var originalHome = V.home, originalSearch = V.search, originalEvent = V.event, originalSeatsheet = O.seatsheet;
   var originalEvents = Object.values(EV).map(function (e) { return Object.assign({}, e); });
-  ['offers', 'tickets', 'selling', 'sales', 'dues', 'requests', 'threads', 'activity', 'parking'].forEach(function (key) { S[key] = []; });
+  ['offers', 'tickets', 'selling', 'sales', 'requests', 'threads', 'activity', 'parking'].forEach(function (key) { S[key] = []; });
   S.watch = {}; S.drops = {}; S.teams = {}; S.ready = 0; S.settings.payout = 'Not connected';
   S.where.when = 'This month';
   ui.UPCOMING.splice(0); ui.FRIEND_PLANS.splice(0);
@@ -96,7 +96,7 @@ window.installTeezyBackend = function (ui) {
     ui.UPCOMING.splice(0); data[1].filter(function (e) { return !EV[e.id].past; }).forEach(function (e) { ui.UPCOMING.push(e.id); });
     S.listings = catalog.filter(function (l) { return !me || l.sellerId !== me.id; }).map(function (l) {
       return { id: l.id, ev: l.eventId, sec: l.section || 'General admission', row: '', seats: l.qtyAvailable,
-        seller: l.sellerName, price: l.priceCents / 100, tier: l.tier, tag: l.tier, trades: 0, raw: l };
+        seller: l.sellerName, price: l.priceCents / 100, tier: l.tier, tag: { ga: 'GA', student: 'Student', reserved: 'Reserved', entry: 'Entry' }[l.tier] || l.tier, trades: 0, raw: l };
     });
     S.selling = data[3].map(function (l) { return { id: l.id, ev: l.eventId, sec: l.section || l.tier, row: '',
       qty: l.qtyAvailable, price: l.priceCents / 100, sold: l.qtyAvailable === 0 || l.status !== 'active', views: 0, offers: [], raw: l }; });
@@ -175,22 +175,49 @@ window.installTeezyBackend = function (ui) {
       button('Refresh listings', 'reload', '', true) + (runtime.transferTesting ? '<a class="btn btn-ghost" href="/transfer-test.html">Test ticket transfers</a>' : '') + (ui.UPCOMING.length ? '' : empty('No upcoming events yet.')));
   };
   V.search = originalSearch;
+  // The designed event page and seat sheet, on real listings. Buying is real; there is no offers or chat
+  // API yet, so a lower price saves a price alert instead of sending an offer.
+  function alertLabel(price) { return 'Alert me at $' + price + ' or less'; }
+  function saveAlert(ev, qty, price) {
+    if (!signedIn()) return;
+    return run(async function () {
+      await api('POST', '/api/desired-tickets', { eventId: ev, qty: Math.min(qty, 10), maxPriceCents: Math.round(price * 100) });
+      S.overlay = null; await refresh();
+      ui.toast('Alert saved. We’ll notify you when ' + (qty === 1 ? 'a ticket is' : qty + ' tickets are') + ' listed at ' + money(price) + ' or less.');
+    });
+  }
+  function sellBody(p) {
+    var mine = S.selling.filter(function (x) { return x.ev === p.ev && !x.sold; }), sold = '';
+    sales.filter(function (o) { return o.eventId === p.ev; }).forEach(function (o) { o.fills.forEach(function (f) { sold += saleCard(o, f); }); });
+    return sold + mine.map(function (x) {
+      return '<div class="card"><div class="between" style="align-items:flex-start"><span><span class="lt">' + esc(x.sec) + ' · ' + x.qty + (x.qty === 1 ? ' ticket' : ' tickets') + '</span><span class="ls">Listed at ' + money(x.price) + ' each</span></span><span class="pill pill-soft">Listed</span></div>' +
+        '<div class="btn-grid">' + button('Edit price', 'editprice', 'data-id="' + x.id + '"', true) + button('Withdraw', 'withdraw', 'data-id="' + x.id + '"', true) + '</div></div>';
+    }).join('') +
+      (mine.length || sold ? '' : '<div class="card"><span class="lt">Nothing listed for this game yet</span><span class="sub">List a ticket you own and can transfer through the official ticketing service.</span></div>') +
+      button(mine.length ? 'List another ticket' : 'List a ticket for this game', 'sellfor', 'data-ev="' + esc(p.ev) + '"') + paymentNote();
+  }
   V.event = function (p) {
     var e = EV[p.ev]; if (!e) return shell('Event unavailable', button('Back', 'back'));
-    var qty = p.qty || 1, list = S.listings.filter(function (l) { return l.ev === p.ev && l.seats >= qty; });
-    return shell(e.name, note(e.date + ' · ' + e.time + ' · ' + e.venue) + paymentNote() +
-      '<div class="seg">' + [1, 2, 3, 4].map(function (n) { return '<button data-act="qty" data-n="' + n + '" class="' + (qty === n ? 'on' : '') + '">' + n + '</button>'; }).join('') + '</div>' +
-      (list.length ? list.map(function (l) { return '<div class="card"><span class="lt">' + esc(l.sec) + '</span>' + note(l.seller + ' · ' + l.seats + ' available · ' + money(l.price) + ' each') +
-        '<div class="btn-grid">' + button('See seat', 'seat', 'data-id="' + l.id + '"', true) + button('Buy ' + qty, 'checkout', 'data-id="' + l.id + '" data-qty="' + qty + '"') + '</div></div>'; }).join('') : empty('No available listings for this quantity.')) +
-      button('Sell for this event', 'sellfor', 'data-ev="' + esc(p.ev) + '"', true) + button('Back', 'back', '', true));
+    if (p.qty == null) p.qty = 1;
+    // Start on the cheapest seats that fit, so the main button buys; sliding lower turns it into an alert.
+    var fits = S.listings.filter(function (l) { return l.ev === p.ev && l.seats >= p.qty; }).map(function (l) { return l.price; });
+    if (p.offer == null && fits.length) p.offer = Math.min.apply(null, fits);
+    var html = originalEvent(p);
+    if (p.mode === 'sell') return html.split('<div class="body">')[0] + '<div class="body">' + sellBody(p) + '</div>';
+    var alertOnly = html.indexOf('data-act="offerall"') >= 0;
+    html = html.replace(/(<button class="btn btn-ink btn-full" data-act=")offerall("[^>]*>)[^<]*/, '$1postreq$2' + alertLabel(p.offer))
+      .replace(/>Post a request at \$\d+</, '>' + alertLabel(p.offer) + '<')
+      .replace(/<button class="link"[^>]*data-act="postreq"[^>]*>[^<]*<\/button>/, function (link) { return alertOnly ? '' : link.replace(/>[^<]*</, '>Or get an alert at $' + p.offer + ' or less<'); })
+      .replace('yet · send it as an offer', 'yet · set an alert instead')
+      .replace(/<div class="shield">([\s\S]*?)<span>[^<]*<\/span>/, '<div class="shield">$1<span>Teezy holds your payment until you confirm the tickets arrived. ' + (runtime.stripePayments && runtime.paymentMode === 'test' ? 'Stripe test mode · no real money moves.' : runtime.demoPayments ? 'Test checkout · no money is charged.' : '') + '</span>');
+    return html;
   };
-  V.seat = function (p) {
-    var l = S.listings.find(function (x) { return x.id === p.id; });
-    if (!l) return shell('Listing unavailable', note('These tickets may have sold. Refresh to see current availability.') + button('Refresh', 'reload') + button('Back', 'back', '', true));
-    var qty = Math.min(p.qty || 1, l.seats);
-    return shell(eventName(l.ev), '<div class="card"><h2 class="title">' + esc(l.sec) + '</h2>' + note(l.raw.seatLabel || l.tier) + note('Seller: ' + l.seller) + note(money(l.price) + ' each · ' + l.seats + ' available') +
-      '<div class="seg">' + Array.from({ length: Math.min(l.seats, 10) }, function (_, i) { return '<button data-act="seatqty" data-n="' + (i + 1) + '" class="' + (qty === i + 1 ? 'on' : '') + '">' + (i + 1) + '</button>'; }).join('') + '</div></div>' +
-      button('Buy ' + qty + ' · ' + money(l.price * qty), 'checkout', 'data-id="' + l.id + '" data-qty="' + qty + '"') + paymentNote() + button('Back', 'back', '', true));
+  O.seatsheet = function (o) {
+    var l = S.listings.find(function (x) { return x.id === o.id; });
+    if (!l) return panel('Listing unavailable', note('These tickets may have sold. Refresh to see current availability.') + button('Refresh', 'reload'));
+    if (o.p == null) o.p = l.price;
+    return originalSeatsheet(o).replace(/<button class="uphint"[\s\S]*?<\/button>/, '').replace(' · 0 trades', '')
+      .replace('data-off="Offer ${p}"', 'data-off="Alert me at ${p}"').replace(/>Offer \$(\d+)</, '>Alert me at $$$1<');
   };
   V.tickets = function () {
     if (!me) return accountPrompt('My Tickets');
@@ -311,6 +338,13 @@ window.installTeezyBackend = function (ui) {
       await refresh(); ui.sheet({ k: 'checkout', order: result.order });
     });
   };
+  A.postreq = function (d) { return saveAlert(d.ev, Number(d.qty) || 1, ui.cur().offer); };
+  A.seatgo = function () {
+    var o = S.overlay, l = S.listings.find(function (x) { return x.id === o.id; });
+    if (!l) return ui.toast('This listing is no longer available. Refresh and try again.');
+    var qty = Math.min(o.qty || 1, l.seats);
+    return o.p >= l.price ? A.checkout({ id: l.id, qty: qty }) : saveAlert(l.ev, qty, o.p);
+  };
   A.resumepay = function (d) { var order = orders.find(function (o) { return o.id === d.id; }); ui.sheet({ k: 'checkout', order: order }); };
   A.pay = function () { var order = S.overlay.order; return run(async function () {
     if (runtime.stripePayments && !demoOrder(order)) {
@@ -329,7 +363,7 @@ window.installTeezyBackend = function (ui) {
   A.reportfill = function (d) { ui.sheet({ k: 'report', orderId: d.order, fillId: d.fill }); };
   A.confirmfill = function (d) { return run(async function () { await api('POST', '/api/orders/' + d.order + '/fills/' + d.fill + '/confirm'); await refresh(); ui.sheet({ k: 'order', id: d.order }); ui.toast('Receipt confirmed and saved'); }); };
   A.withdraw = function (d) { return run(async function () { await api('PATCH', '/api/listings/' + d.id, { withdraw: true }); await refresh(); ui.toast('Listing withdrawn'); }); };
-  ['sendoffer', 'offerall', 'acceptoffer', 'sendcounter', 'postreq', 'fill', 'takeoffer', 'cashout', 'scan', 'dotransfer', 'transfer', 'sellticket', 'chatwith', 'paydues', 'dosplit', 'sellparking'].forEach(function (name) {
+  ['sendoffer', 'offerall', 'acceptoffer', 'sendcounter', 'fill', 'takeoffer', 'cashout', 'scan', 'dotransfer', 'transfer', 'sellticket', 'chatwith', 'seatchat', 'evlist', 'seeoffers', 'sellparking'].forEach(function (name) {
     A[name] = function () { ui.toast('This feature is not connected yet. Use listings and checkout for now.'); };
   });
   // Account data must never be replaced by the demo's simulated actions.
