@@ -37,5 +37,7 @@ export function paymentRuntime() {
     paymentMode: config.paymentProvider === 'stripe' ? (stripeMode() ? 'live' : 'test') : 'demo',
     payoutDelayHours: config.payoutDelayHours,
     autoConfirmHours: config.autoConfirmHours,
+    // Publishable keys are meant for browsers. Only shared when it matches the secret key's mode.
+    stripePublishableKey: config.stripePublishableKey.startsWith(stripeMode() ? 'pk_live_' : 'pk_test_') ? config.stripePublishableKey : '',
   };
 }

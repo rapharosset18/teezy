@@ -10,7 +10,7 @@ import { buyAtPrice, getOrder, advanceEscrow, recordTransfer, confirmTransfer, r
 import { createTransferFixture, testSession } from './services/transferTest.js';
 import { paymentRuntime, stripeClient } from './services/stripe.js';
 import { reportError } from './alerts.js';
-import { startCheckout, syncPayment, startSellerOnboarding, getSellerPayments, sellerDashboard, requestRefund, processWebhook, paymentSummary } from './services/payments.js';
+import { startCheckout, syncPayment, startSellerOnboarding, startEmbeddedOnboarding, getSellerPayments, sellerDashboard, requestRefund, processWebhook, paymentSummary } from './services/payments.js';
 import { createListing, updateListing } from './services/listings.js';
 import { getPriceData } from './services/priceData.js';
 import { listDesired, createDesired, updateDesired, deleteDesired } from './services/desiredTickets.js';
@@ -85,6 +85,7 @@ export function buildApp({ logger = false, stripe } = {}) {
   app.get('/api/me/payments', async (req) => paymentSummary(paymentUser(req)));
   app.get('/api/me/seller-payments', async (req) => getSellerPayments(paymentUser(req), stripe));
   app.post('/api/me/seller-onboarding', async (req) => startSellerOnboarding(paymentUser(req), stripe));
+  app.post('/api/me/seller-onboarding/session', async (req) => startEmbeddedOnboarding(paymentUser(req), stripe));
   app.post('/api/me/seller-dashboard', async (req) => sellerDashboard(paymentUser(req), stripe));
   app.post('/api/orders/:id/checkout', async (req) => startCheckout(req.params.id, paymentUser(req), stripe));
   app.post('/api/orders/:id/payment/sync', async (req) => syncPayment(req.params.id, paymentUser(req), stripe));

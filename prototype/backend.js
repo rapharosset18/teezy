@@ -353,7 +353,56 @@ window.installTeezyBackend = function (ui) {
     await api('POST', '/api/orders/' + order.id + '/pay'); await refresh(); S.overlay = { k: 'order', id: order.id }; ui.toast('Test payment saved. Waiting for the seller to transfer.');
   }); };
   A.payouts = function () { if (signedIn()) ui.sheet({ k: 'payouts' }); };
-  A.onboard = function () { return run(async function () { var result = await api('POST', '/api/me/seller-onboarding'); window.location.assign(result.url); }); };
+  A.onboard = function () {
+    if (runtime.stripePublishableKey) return openOnboarding();
+    return run(async function () { var result = await api('POST', '/api/me/seller-onboarding'); window.location.assign(result.url); });
+  };
+  // Stripe's onboarding form, shown inside the app. It lives outside the render root so redraws keep it.
+  var connectScript, connectInstance;
+  function loadConnect() {
+    if (!connectScript) connectScript = new Promise(function (resolve, reject) {
+      window.StripeConnect = window.StripeConnect || {};
+      window.StripeConnect.onLoad = function () { resolve(window.StripeConnect); };
+      var tag = document.createElement('script');
+      tag.src = 'https://connect-js.stripe.com/v1.0/connect.js'; tag.async = true;
+      tag.onload = function () { if (window.StripeConnect.init) resolve(window.StripeConnect); };
+      tag.onerror = function () { connectScript = null; reject(new Error('Stripe could not load. Check your connection and try again.')); };
+      document.head.appendChild(tag);
+    });
+    return connectScript;
+  }
+  function closeOnboarding() {
+    var host = document.getElementById('stripe-onboard'); if (host) host.remove();
+    return run(async function () { await refresh(); ui.sheet({ k: 'payouts' }); });
+  }
+  function openOnboarding() {
+    if (document.getElementById('stripe-onboard')) return;
+    var screen = document.getElementById('screen') || document.body, css = getComputedStyle(document.documentElement);
+    var host = document.createElement('div');
+    host.id = 'stripe-onboard'; host.setAttribute('role', 'dialog'); host.setAttribute('aria-label', 'Seller payout setup');
+    host.style.cssText = 'position:absolute;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);animation:up .26s ease';
+    host.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 18px 10px">' +
+      '<h2 class="title" style="font-size:1.3rem;margin:0">Seller payouts</h2>' +
+      '<button class="btn btn-ghost" data-close-onboard>Close</button></div>' +
+      '<p class="sub" style="margin:0 18px 8px">Stripe test mode · use Stripe’s test data buttons.</p>' +
+      '<div data-mount style="flex:1;overflow-y:auto;padding:0 18px calc(24px + env(safe-area-inset-bottom,0px))"><p class="sub">Loading Stripe…</p></div>';
+    screen.appendChild(host);
+    host.querySelector('[data-close-onboard]').onclick = closeOnboarding;
+    loadConnect().then(function (StripeConnect) {
+      if (!connectInstance) connectInstance = StripeConnect.init({
+        publishableKey: runtime.stripePublishableKey,
+        fetchClientSecret: async function () { return (await api('POST', '/api/me/seller-onboarding/session')).clientSecret; },
+        appearance: { variables: { colorPrimary: css.getPropertyValue('--accent').trim() || '#FF6A13',
+          colorBackground: css.getPropertyValue('--bg').trim() || '#FFFFFF', colorText: css.getPropertyValue('--ink').trim() || '#0E0E10',
+          fontFamily: 'Archivo, system-ui, -apple-system, sans-serif', borderRadius: '12px' } },
+        fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap' }],
+      });
+      var form = connectInstance.create('account-onboarding');
+      form.setOnExit(closeOnboarding);
+      if (form.setOnLoadError) form.setOnLoadError(function (e) { ui.toast((e.error && e.error.message) || 'Stripe could not load the form.'); });
+      var mount = host.querySelector('[data-mount]'); mount.innerHTML = ''; mount.appendChild(form);
+    }).catch(function (err) { host.remove(); ui.toast(err.message); });
+  }
   A.stripedashboard = function () { return run(async function () { var result = await api('POST', '/api/me/seller-dashboard'); window.location.assign(result.url); }); };
   A.refund = function (d) { return run(async function () { await api('POST', '/api/orders/' + d.id + '/refund'); await refresh(); ui.sheet({ k: 'order', id: d.id }); ui.toast('Refund requested. Its status is saved with your payment.'); }); };
   A.order = function (d) { ui.sheet({ k: 'order', id: d.id }); };

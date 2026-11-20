@@ -43,6 +43,7 @@ Teezy service → **Variables** → add:
 | `EMAIL_FROM` | e.g. `Teezy <login@yourdomain.com>` (the domain verified in Resend) |
 | `PAYMENT_PROVIDER` | `stripe` |
 | `STRIPE_SECRET_KEY` | your Stripe **test** secret key (`sk_test_…`) |
+| `STRIPE_PUBLISHABLE_KEY` | your Stripe **test** publishable key (`pk_test_…`); sellers then set up payouts inside the app instead of on a Stripe page |
 | `STRIPE_WEBHOOK_SECRET` | from step 4 (platform endpoint) |
 | `STRIPE_CONNECT_WEBHOOK_SECRET` | from step 4 (connected accounts endpoint) |
 | `ALLOW_LIVE_PAYMENTS` | `false` |

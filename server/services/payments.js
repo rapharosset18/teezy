@@ -42,9 +42,9 @@ export async function getSellerPayments(userId, stripe = stripeClient()) {
   if (!row) return { connected: false, ready: false };
   return accountStatus(await retrieveAccount(stripe, row.stripe_account_id));
 }
-export async function startSellerOnboarding(userId, stripe = stripeClient()) {
+async function ensureSellerAccount(userId, stripe) {
   const user = await verifiedUser(userId);
-  const accountId = await withTransaction(async (db) => {
+  return withTransaction(async (db) => {
     await db.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [userId]);
     const existing = await sellerAccount(userId, db);
     if (existing) return existing.stripe_account_id;
@@ -71,9 +71,19 @@ export async function startSellerOnboarding(userId, stripe = stripeClient()) {
     await db.query(`INSERT INTO seller_accounts (user_id,stripe_account_id,livemode) VALUES ($1,$2,$3)`, [userId, account.id, stripeMode()]);
     return account.id;
   });
+}
+export async function startSellerOnboarding(userId, stripe = stripeClient()) {
+  const accountId = await ensureSellerAccount(userId, stripe);
   const link = await stripe.v2.core.accountLinks.create({ account: accountId, use_case: { type: 'account_onboarding',
     account_onboarding: { refresh_url: `${origin()}/?seller=refresh`, return_url: `${origin()}/?seller=return` } } });
   return { url: link.url };
+}
+// In-app onboarding: a short-lived Account Session the Connect.js onboarding form uses.
+export async function startEmbeddedOnboarding(userId, stripe = stripeClient()) {
+  const accountId = await ensureSellerAccount(userId, stripe);
+  const session = await stripe.accountSessions.create({ account: accountId,
+    components: { account_onboarding: { enabled: true } } });
+  return { clientSecret: session.client_secret };
 }
 export async function sellerDashboard(userId, stripe = stripeClient()) {
   const row = await sellerAccount(userId);

@@ -11,6 +11,7 @@ export const config = {
   isProduction: env.NODE_ENV === 'production',
   paymentProvider: env.PAYMENT_PROVIDER || 'demo',
   stripeSecretKey: env.STRIPE_SECRET_KEY || '',
+  stripePublishableKey: env.STRIPE_PUBLISHABLE_KEY || '', // pk_ key for the in-app seller onboarding form
   stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET || '',
   stripeConnectWebhookSecret: env.STRIPE_CONNECT_WEBHOOK_SECRET || '', // Stripe gives connected-account events their own endpoint and secret
   allowLivePayments: env.ALLOW_LIVE_PAYMENTS === 'true',

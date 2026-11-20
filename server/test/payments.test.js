@@ -6,7 +6,7 @@ import { query } from '../db.js';
 import { buildApp } from '../app.js';
 import { resetDb, addListing, order } from './helpers.js';
 import { buyAtPrice, expireOrder, getOrder, recordTransfer, confirmTransfer, reportProblem, saveDeliveryProof } from '../services/orders.js';
-import { startCheckout, processWebhook, startSellerOnboarding, getSellerPayments, requestRefund, paymentSweep, syncPayment, disputeReport } from '../services/payments.js';
+import { startCheckout, processWebhook, startSellerOnboarding, startEmbeddedOnboarding, getSellerPayments, requestRefund, paymentSweep, syncPayment, disputeReport } from '../services/payments.js';
 import { stripeClient } from '../services/stripe.js';
 import { createListing } from '../services/listings.js';
 
@@ -17,6 +17,7 @@ function fakeStripe() {
   const client = {
     webhooks: sdk.webhooks, sessions, transfersMade: transfers, refundsMade: refunds, calls,
     accounts: { createLoginLink: async () => ({ url: 'https://connect.stripe.com/express/test' }) },
+    accountSessions: { create: async (params) => { calls.push(['session', params]); return { client_secret: 'accs_secret_test' }; } },
     v2: { core: {
       accounts: {
         create: async (params, options) => { calls.push(['account', params, options]); return { id: 'acct_created' }; },
@@ -137,6 +138,15 @@ describe('Stripe marketplace payments', () => {
     await startSellerOnboarding('s3', stripe);
     assert.equal(stripe.calls.filter((c) => c[0] === 'account').length, 1);
     assert.equal((await query("SELECT stripe_account_id FROM seller_accounts WHERE user_id='s3'")).rows[0].stripe_account_id, 'acct_created');
+  });
+
+  it('opens in-app onboarding on the same seller account', async () => {
+    const first = await startEmbeddedOnboarding('s3', stripe);
+    await startEmbeddedOnboarding('s3', stripe);
+    assert.equal(first.clientSecret, 'accs_secret_test');
+    assert.equal(stripe.calls.filter((c) => c[0] === 'account').length, 1);
+    const [, session] = stripe.calls.find((c) => c[0] === 'session');
+    assert.deepEqual(session, { account: 'acct_created', components: { account_onboarding: { enabled: true } } });
   });
 
   it('creates Accounts v2 recipients where Teezy owns fees and losses', async () => {
